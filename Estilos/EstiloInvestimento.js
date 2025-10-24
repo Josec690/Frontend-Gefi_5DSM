@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   },
 
   titleContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(8,156,8, 0.08)',
     padding: 15,
     borderRadius: 12,
     marginTop: 20,

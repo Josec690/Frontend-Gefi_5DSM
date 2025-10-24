@@ -1,14 +1,14 @@
-import React from "react";
-import { View, Text, StatusBar, Image } from "react-native";
-import styles from "./Estilos/EstiloPerfil";
+import React from 'react';
+import { View, Text, StatusBar, Image } from 'react-native';
+import styles from './Estilos/EstiloPerfil'; 
 
-import perfilIcon from "./assets/Perfil.png";
-import iconeSaidaGota from "./assets/Gota.png";
-import iconeSaidaRaio from "./assets/Raio.png";
+import perfilIcon from './assets/Perfil.png';
+import iconeSaidaGota from './assets/Gota.png'; 
+import iconeSaidaRaio from './assets/Raio.png';
 
 export default function PerfilScreen() {
   const nome = "Fulano";
-  const cpf = "12********-00";
+  const cpf = "12********-00"; 
   const balancoMensal = 5000;
 
   return (

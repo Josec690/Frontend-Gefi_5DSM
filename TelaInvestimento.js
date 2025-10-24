@@ -1,12 +1,12 @@
-import React from "react";
-import { View, Text, FlatList } from "react-native";
-import styles from "./Estilos/EstiloInvestimento";
+import React from 'react';
+import { View, Text, FlatList } from 'react-native';
+import styles from './Estilos/EstiloInvestimento';
 
 const investimentos = [
-  { id: "1", nome: "Ações - Empresa A", rendimento: "8% ao ano" },
-  { id: "2", nome: "Fundo Imobiliário", rendimento: "6% ao ano" },
-  { id: "3", nome: "Tesouro Direto", rendimento: "5% ao ano" },
-  { id: "4", nome: "CDB Banco X", rendimento: "7% ao ano" },
+  { id: '1', nome: 'Ações - Empresa A', rendimento: '8% ao ano' },
+  { id: '2', nome: 'Fundo Imobiliário', rendimento: '6% ao ano' },
+  { id: '3', nome: 'Tesouro Direto', rendimento: '5% ao ano' },
+  { id: '4', nome: 'CDB Banco X', rendimento: '7% ao ano' },
 ];
 
 export default function InvestScreen() {
