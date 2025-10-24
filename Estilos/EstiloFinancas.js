@@ -31,7 +31,7 @@ export default StyleSheet.create({
   },
   button: {
     width: 260,
-    backgroundColor: 'rgba(8, 156, 1, 0.22)', // Seu background customizado
+    backgroundColor: 'rgba(8, 156, 1, 0.22)',
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',

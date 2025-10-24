@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Dimensions } from 'react-native';
-
-const { width } = Dimensions.get('window');
+import { View, Text, TouchableOpacity, FlatList, useWindowDimensions, StyleSheet } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import styles from './Estilos/EstiloPerguntas';
 
 const questions = [
   {
@@ -21,80 +21,113 @@ const questions = [
   },
 ];
 
-export default function App() {
+export default function TelaPerguntas({ navigation }) {
   const [answers, setAnswers] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef();
+  const [showWelcome, setShowWelcome] = useState(false);
+  const flatListRef = useRef(null);
+  const { width, height } = useWindowDimensions();
 
   const handleAnswer = (questionId, answer) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: answer }));
+    const updatedAnswers = { ...answers, [questionId]: answer };
+    setAnswers(updatedAnswers);
 
     const nextIndex = currentIndex + 1;
     if (nextIndex < questions.length) {
-      flatListRef.current.scrollToIndex({ index: nextIndex });
       setCurrentIndex(nextIndex);
-    } else {
-      console.log('Respostas completas:', { ...answers, [questionId]: answer });
+      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+    }
+
+    if (Object.keys(updatedAnswers).length === questions.length) {
+      setShowWelcome(true);
+      setTimeout(() => {
+        navigation.navigate('Usuario'); 
+      }, 2000);
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.questionContainer}>
-      <Text style={styles.questionText}>{item.text}</Text>
-      <View style={styles.optionsContainer}>
-        {item.options.map((option) => (
-          <TouchableOpacity
-            key={option}
-            style={styles.optionButton}
-            onPress={() => handleAnswer(item.id, option)}
-          >
-            <Text style={styles.optionText}>{option}</Text>
-          </TouchableOpacity>
-        ))}
+  const onMomentumScrollEnd = (event) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const newIndex = Math.round(offsetX / width);
+    setCurrentIndex(newIndex);
+  };
+
+  const renderItem = ({ item }) => {
+    const selectedAnswer = answers[item.id];
+
+    return (
+      <View style={[styles.questionContainer, { width, height: height - 150 }]}>
+        <Text style={styles.questionText}>{item.text}</Text>
+        <View style={styles.optionsContainer}>
+          {item.options.map((option) => {
+            const isSelected = selectedAnswer === option;
+            return (
+              <TouchableOpacity
+                key={option}
+                style={[styles.optionButton, isSelected && styles.optionButtonSelected]}
+                onPress={() => handleAnswer(item.id, option)}
+              >
+                <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
+
+  const getItemLayout = (_, index) => ({
+    length: width,
+    offset: width * index,
+    index,
+  });
 
   return (
-    <FlatList
-      ref={flatListRef}
-      data={questions}
-      renderItem={renderItem}
-      horizontal
-      pagingEnabled
-      scrollEnabled={false} 
-      keyExtractor={(item) => item.id}
-      showsHorizontalScrollIndicator={false}
-    />
+    <View style={{ flex: 1, backgroundColor: '#000' }}>
+      <Text style={styles.title}>GeFi</Text>
+
+      <FlatList
+        ref={flatListRef}
+        data={questions}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={onMomentumScrollEnd}
+        extraData={answers}
+        getItemLayout={getItemLayout}
+        initialScrollIndex={currentIndex}
+        scrollEnabled={true} 
+      />
+
+      <View style={styles.progressBarContainer}>
+        {questions.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.progressSegment,
+              currentIndex === index && styles.progressSegmentActive,
+            ]}
+          />
+        ))}
+      </View>
+
+      {showWelcome && (
+        <View style={StyleSheet.absoluteFill}>
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }]}>
+            <Animatable.Text
+              animation="fadeInDown"
+              duration={1000}
+              style={{ fontSize: 32, fontWeight: 'bold', color: '#fff' }}
+            >
+              Bem-vindo!
+            </Animatable.Text>
+          </View>
+        </View>
+      )}
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  questionContainer: {
-    width,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  questionText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  optionsContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  optionButton: {
-    backgroundColor: '#2e86de',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    marginVertical: 10,
-  },
-  optionText: {
-    color: '#fff',
-    fontSize: 18,
-  },
-});

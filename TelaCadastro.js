@@ -1,12 +1,23 @@
 import React, { useState, useRef } from 'react';
-import {View,Text,TextInput,TouchableOpacity,StatusBar,Image,ScrollView,Platform,KeyboardAvoidingView,TouchableWithoutFeedback,Keyboard,
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StatusBar,
+  Image,
+  ScrollView,
+  Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import styles from './Estilos/EstiloCadastro';
 import Grafico from './assets/Grafico.png';
 
 const isWeb = Platform.OS === 'web';
 
-export default function CadastroScreen({ navigation }) {
+export default function TelaCadastro({ navigation }) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [cpf, setCpf] = useState('');
@@ -27,40 +38,32 @@ export default function CadastroScreen({ navigation }) {
     if (!nome.trim()) {
       setNomeErro('Esse campo precisa ser preenchido!');
       hasError = true;
-    } else {
-      setNomeErro('');
-    }
+    } else setNomeErro('');
 
     if (!email.trim()) {
       setEmailErro('Esse campo precisa ser preenchido!');
       hasError = true;
-    } else {
-      setEmailErro('');
-    }
+    } else setEmailErro('');
 
     if (!cpf.trim()) {
       setCpfErro('Esse campo precisa ser preenchido!');
       hasError = true;
-    } else {
-      setCpfErro('');
-    }
+    } else setCpfErro('');
 
     if (!senha.trim()) {
       setSenhaErro('Esse campo precisa ser preenchido!');
       hasError = true;
-    } else {
-      setSenhaErro('');
-    }
+    } else setSenhaErro('');
 
     if (!hasError) {
       console.log('Cadastro realizado com sucesso!');
-      navigation.navigate('Usuario');
+      navigation.navigate('TelaPerguntas');
     }
   };
 
   const content = (
     <ScrollView
-      contentContainerStyle={styles.container}
+      contentContainerStyle={{ flexGrow: 1, padding: 20, alignItems: 'center' }}
       keyboardShouldPersistTaps="handled"
       style={{ flex: 1 }}
     >
@@ -71,11 +74,11 @@ export default function CadastroScreen({ navigation }) {
       </View>
 
       <Text style={styles.text}>
-        Bem-Vindo ao começo de uma vida financeira saudável
+        Bem-vindo ao começo de uma vida financeira saudável
       </Text>
       <Image source={Grafico} style={styles.image} />
 
-      <View style={{ marginBottom: 15 }}>
+      <View style={{ width: '100%', marginBottom: 15 }}>
         {nomeErro ? <Text style={styles.errorText}>{nomeErro}</Text> : null}
         <TextInput
           style={styles.input}
@@ -89,7 +92,7 @@ export default function CadastroScreen({ navigation }) {
         />
       </View>
 
-      <View style={{ marginBottom: 15 }}>
+      <View style={{ width: '100%', marginBottom: 15 }}>
         {emailErro ? <Text style={styles.errorText}>{emailErro}</Text> : null}
         <TextInput
           ref={emailRef}
@@ -102,10 +105,12 @@ export default function CadastroScreen({ navigation }) {
           returnKeyType="next"
           onSubmitEditing={() => cpfRef.current?.focus()}
           blurOnSubmit={false}
+          autoCapitalize="none"
+          autoCorrect={false}
         />
       </View>
 
-      <View style={{ marginBottom: 15 }}>
+      <View style={{ width: '100%', marginBottom: 15 }}>
         {cpfErro ? <Text style={styles.errorText}>{cpfErro}</Text> : null}
         <TextInput
           ref={cpfRef}
@@ -121,7 +126,7 @@ export default function CadastroScreen({ navigation }) {
         />
       </View>
 
-      <View style={{ marginBottom: 15 }}>
+      <View style={{ width: '100%', marginBottom: 15 }}>
         {senhaErro ? <Text style={styles.errorText}>{senhaErro}</Text> : null}
         <TextInput
           ref={senhaRef}
