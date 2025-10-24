@@ -36,7 +36,7 @@ export default StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     alignSelf: 'center', 
-    marginTop: 530,
+    marginTop: 430,
     borderBottomRightRadius: 20, 
     borderBottomLeftRadius: 0,
     borderTopRightRadius: 0,
