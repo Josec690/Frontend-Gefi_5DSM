@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, useWindowDimensions, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, useWindowDimensions, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import api from './services/api';
 import styles from './Estilos/EstiloPerguntas';
 
 const questions = [
@@ -25,10 +26,26 @@ export default function TelaPerguntas({ navigation }) {
   const [answers, setAnswers] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [loading, setLoading] = useState(false);
   const flatListRef = useRef(null);
   const { width, height } = useWindowDimensions();
 
-  const handleAnswer = (questionId, answer) => {
+  const salvarRespostas = async (respostas) => {
+    setLoading(true);
+    try {
+      await api.post('/questionario', {
+        respostas: respostas
+      });
+      console.log('✅ Questionário salvo com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar questionário:', error);
+      Alert.alert('Aviso', 'Não foi possível salvar o questionário, mas você pode continuar usando o app.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAnswer = async (questionId, answer) => {
     const updatedAnswers = { ...answers, [questionId]: answer };
     setAnswers(updatedAnswers);
 
@@ -38,7 +55,11 @@ export default function TelaPerguntas({ navigation }) {
       flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
     }
 
+    // Se respondeu todas as perguntas
     if (Object.keys(updatedAnswers).length === questions.length) {
+      // Salvar no backend
+      await salvarRespostas(updatedAnswers);
+      
       setShowWelcome(true);
       setTimeout(() => {
         navigation.navigate('Usuario'); 
@@ -66,6 +87,7 @@ export default function TelaPerguntas({ navigation }) {
                 key={option}
                 style={[styles.optionButton, isSelected && styles.optionButtonSelected]}
                 onPress={() => handleAnswer(item.id, option)}
+                disabled={loading}
               >
                 <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
                   {option}
@@ -114,6 +136,13 @@ export default function TelaPerguntas({ navigation }) {
           />
         ))}
       </View>
+
+      {loading && (
+        <View style={{ position: 'absolute', bottom: 100, alignSelf: 'center' }}>
+          <ActivityIndicator size="large" color="#57FF5A" />
+          <Text style={{ color: '#fff', marginTop: 10 }}>Salvando...</Text>
+        </View>
+      )}
 
       {showWelcome && (
         <View style={StyleSheet.absoluteFill}>

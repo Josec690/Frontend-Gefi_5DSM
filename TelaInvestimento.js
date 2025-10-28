@@ -1,15 +1,40 @@
-import React from 'react';
-import { View, Text, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import api from './services/api';
 import styles from './Estilos/EstiloInvestimento';
 
-const investimentos = [
-  { id: '1', nome: 'Ações - Empresa A', rendimento: '8% ao ano' },
-  { id: '2', nome: 'Fundo Imobiliário', rendimento: '6% ao ano' },
-  { id: '3', nome: 'Tesouro Direto', rendimento: '5% ao ano' },
-  { id: '4', nome: 'CDB Banco X', rendimento: '7% ao ano' },
-];
 
 export default function InvestScreen() {
+  const [investimentos, setInvestimentos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const carregarInvestimentos = async () => {
+    try {
+      const response = await api.get('/investimentos');
+      setInvestimentos(response.data);
+    } catch (error) {
+      console.error('Erro ao carregar investimentos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      carregarInvestimentos();
+    }, [])
+  );
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#57FF5A" />
+        <Text style={{ color: '#fff', marginTop: 10 }}>Carregando investimentos...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -22,7 +47,10 @@ export default function InvestScreen() {
         renderItem={({ item }) => (
           <View style={styles.investItem}>
             <Text style={styles.investName}>{item.nome}</Text>
-            <Text style={styles.investYield}>{item.rendimento}</Text>
+            <Text style={styles.investType}>Tipo: {item.tipo}</Text>
+            <Text style={styles.investYield}>Rendimento: {item.rendimento}</Text>
+            <Text style={styles.investRisk}>Risco: {item.risco}</Text>
+            <Text style={styles.investLiquidity}>Liquidez: {item.liquidez}</Text>
           </View>
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}

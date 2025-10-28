@@ -36,7 +36,7 @@ export default StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     alignSelf: 'center', 
-    marginTop: 430,
+    marginTop: 30,
     borderBottomRightRadius: 20, 
     borderBottomLeftRadius: 0,
     borderTopRightRadius: 0,
@@ -98,5 +98,93 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+  },    
+  input: {
+    backgroundColor: '#2a2a2a',
+    color: '#fff',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: '#57FF5A',
+    borderRadius: 4,
+    marginRight: 10,
+  },
+  checkboxMarcado: {
+    backgroundColor: '#57FF5A',
+  },
+  checkboxTexto: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  modalButtonCancelar: {
+    backgroundColor: '#666',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  transacaoItem: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1a1a',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  transacaoDescricao: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  transacaoCategoria: {
+    color: '#999',
+    fontSize: 14,
+    marginTop: 4,
+  },
+  transacaoData: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  transacaoValor: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  valorPositivo: {
+    color: '#57FF5A',
+  },
+  valorNegativo: {
+    color: '#ff5757',
+  },
+  botaoDeletar: {
+    backgroundColor: '#ff5757',
+    padding: 6,
+    borderRadius: 4,
+    marginTop: 8,
+  },
+  textoDeletar: {
+    color: '#fff',
+    fontSize: 12,
+  },
+  secaoTitulo: {
+    color: '#57FF5A',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 10,
+  },
+  textoVazio: {
+    color: '#666',
+    textAlign: 'center',
+    padding: 20,
   },
 });
