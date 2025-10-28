@@ -1,11 +1,43 @@
-# Sample Snack app
+# 💰 GeFi - Gestão Financeira
 
-Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by scanning the **QR code** or use the iOS or Android emulators. When you're done, click **Save** and share the link!
+Sistema de gerenciamento financeiro com Backend (Flask) e Frontend (React Native).
 
-When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Download** your project and use it with [expo cli](https://docs.expo.dev/get-started/installation/#expo-cli)).
+---
 
-All projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the `<>` button.
+## 🚀 Como Rodar
 
-If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.dev/c/expo-dev-tools/61) or [Discord](https://chat.expo.dev/).
+### 1️⃣ Backend
+```bash
+cd BACKEND
+.\start.bat
+```
 
-Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack).
+Siga os passos do script. O backend estará em: **http://localhost:5000**
+
+---
+
+### 2️⃣ Frontend
+
+**Em outro terminal:**
+```bash
+cd FRONTEND
+npm install
+npm start
+```
+
+**Para abrir o app:**
+```bash
+# Android
+npm run android
+
+# iOS
+npm run ios
+```
+
+
+
+
+
+---
+
+**🎉 Pronto para usar!**

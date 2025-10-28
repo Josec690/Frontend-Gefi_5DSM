@@ -10,21 +10,23 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/hooks": "*",
     "@react-navigation/bottom-tabs": "*",
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
+    "axios": "^1.12.2",
     "expo": "^54.0.20",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",
     "react-native": "0.81.5",
+    "react-native-animatable": "*",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-paper": "4.9.2",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
-    "react-native-vector-icons": "*",
-    "react-native-animatable": "*"
+    "react-native-vector-icons": "*"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",

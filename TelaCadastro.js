@@ -11,9 +11,13 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import styles from './Estilos/EstiloCadastro';
 import Grafico from './assets/Grafico.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from './services/api'; // Importa o serviço
 
 const isWeb = Platform.OS === 'web';
 
@@ -22,6 +26,7 @@ export default function TelaCadastro({ navigation }) {
   const [email, setEmail] = useState('');
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [nomeErro, setNomeErro] = useState('');
   const [emailErro, setEmailErro] = useState('');
@@ -32,32 +37,73 @@ export default function TelaCadastro({ navigation }) {
   const cpfRef = useRef(null);
   const senhaRef = useRef(null);
 
-  const handleCadastro = () => {
+  const handleCadastro = async () => {
+    // Limpar erros anteriores
+    setNomeErro('');
+    setEmailErro('');
+    setCpfErro('');
+    setSenhaErro('');
+
+    // Validações básicas
     let hasError = false;
 
     if (!nome.trim()) {
       setNomeErro('Esse campo precisa ser preenchido!');
       hasError = true;
-    } else setNomeErro('');
+    }
 
     if (!email.trim()) {
       setEmailErro('Esse campo precisa ser preenchido!');
       hasError = true;
-    } else setEmailErro('');
+    }
 
     if (!cpf.trim()) {
       setCpfErro('Esse campo precisa ser preenchido!');
       hasError = true;
-    } else setCpfErro('');
+    }
 
     if (!senha.trim()) {
       setSenhaErro('Esse campo precisa ser preenchido!');
       hasError = true;
-    } else setSenhaErro('');
+    }
 
-    if (!hasError) {
-      console.log('Cadastro realizado com sucesso!');
+    if (hasError) return;
+
+    setLoading(true);
+
+    try {
+      // Chamada para o backend
+      const response = await api.post('/cadastro', {
+        nome: nome.trim(),
+        email: email.trim().toLowerCase(),
+        cpf: cpf.trim(),
+        senha: senha,
+      });
+
+      // Salvar token e dados do usuário
+      await AsyncStorage.setItem('token', response.data.token);
+      await AsyncStorage.setItem('usuario_id', response.data.usuario_id);
+
+      Alert.alert('Sucesso!', 'Cadastro realizado com sucesso!');
+      
+      // Navegar para a próxima tela
       navigation.navigate('TelaPerguntas');
+
+    } catch (error) {
+      console.error('Erro no cadastro:', error);
+      
+      if (error.response) {
+        // Erro do servidor
+        Alert.alert('Erro', error.response.data.erro || 'Erro ao cadastrar');
+      } else if (error.request) {
+        // Sem resposta do servidor
+        Alert.alert('Erro', 'Não foi possível conectar ao servidor. Verifique sua conexão.');
+      } else {
+        // Outro erro
+        Alert.alert('Erro', 'Erro ao processar cadastro');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,6 +135,7 @@ export default function TelaCadastro({ navigation }) {
           returnKeyType="next"
           onSubmitEditing={() => emailRef.current?.focus()}
           blurOnSubmit={false}
+          editable={!loading}
         />
       </View>
 
@@ -107,6 +154,7 @@ export default function TelaCadastro({ navigation }) {
           blurOnSubmit={false}
           autoCapitalize="none"
           autoCorrect={false}
+          editable={!loading}
         />
       </View>
 
@@ -123,6 +171,7 @@ export default function TelaCadastro({ navigation }) {
           returnKeyType="next"
           onSubmitEditing={() => senhaRef.current?.focus()}
           blurOnSubmit={false}
+          editable={!loading}
         />
       </View>
 
@@ -138,11 +187,20 @@ export default function TelaCadastro({ navigation }) {
           secureTextEntry
           returnKeyType="done"
           onSubmitEditing={handleCadastro}
+          editable={!loading}
         />
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleCadastro}>
-        <Text style={styles.buttonText}>Cadastrar</Text>
+      <TouchableOpacity
+        style={[styles.button, loading && { opacity: 0.5 }]}
+        onPress={handleCadastro}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Cadastrar</Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );
