@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StatusBar, Image } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -7,7 +8,7 @@ import Grafico from './assets/Grafico1.png';
 import TelaCadastro from './TelaCadastro';
 import TelaLogin from './TelaLogin';
 import Usuario from './TelaUsuario';
-import TelaPerguntas from './TelaPerguntas'; 
+import TelaPerguntas from './TelaPerguntas';
 import styles from './Estilos/EstiloApp';
 
 const Stack = createNativeStackNavigator();
@@ -40,15 +41,25 @@ function TelaIntro({ navigation }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    // Deixa o app em tela cheia (oculta a barra de navegação)
+    NavigationBar.setVisibilityAsync('hidden');
+    NavigationBar.setBackgroundColorAsync('transparent');
+  }, []);
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Intro" component={TelaIntro} />
-        <Stack.Screen name="Cadastro" component={TelaCadastro} />
-        <Stack.Screen name="TelaPerguntas" component={TelaPerguntas} /> 
-        <Stack.Screen name="Login" component={TelaLogin} />
-        <Stack.Screen name="Usuario" component={Usuario} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <StatusBar hidden />
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Intro" component={TelaIntro} />
+          <Stack.Screen name="Cadastro" component={TelaCadastro} />
+          <Stack.Screen name="TelaPerguntas" component={TelaPerguntas} />
+          <Stack.Screen name="Login" component={TelaLogin} />
+          <Stack.Screen name="Usuario" component={Usuario} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 }
+
