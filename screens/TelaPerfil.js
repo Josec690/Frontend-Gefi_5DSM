@@ -1,6 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StatusBar, Image, ActivityIndicator, RefreshControl, ScrollView } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StatusBar, 
+  Image, 
+  ActivityIndicator, 
+  RefreshControl, 
+  ScrollView, 
+  TouchableOpacity 
+} from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import api from '../services/api';
 import styles from '../styles/EstiloPerfil'; 
 
@@ -9,6 +18,8 @@ import iconeSaidaGota from '../assets/Gota.png';
 import iconeSaidaRaio from '../assets/Raio.png';
 
 export default function PerfilScreen() {
+  const navigation = useNavigation(); // 👈 Hook para navegar entre telas
+
   const [usuario, setUsuario] = useState(null);
   const [balanco, setBalanco] = useState(0);
   const [proximasSaidas, setProximasSaidas] = useState([]);
@@ -17,21 +28,17 @@ export default function PerfilScreen() {
 
   const carregarDados = async () => {
     try {
-      // Buscar dados do usuário
       const responseUsuario = await api.get('/usuario');
       setUsuario(responseUsuario.data);
 
-      // Buscar balanço mensal
       const hoje = new Date();
       const mes = hoje.getMonth() + 1;
       const ano = hoje.getFullYear();
       const responseBalanco = await api.get(`/balanco?mes=${mes}&ano=${ano}`);
       setBalanco(responseBalanco.data.balanco);
 
-      // Buscar próximas saídas
       const responseSaidas = await api.get('/proximas-saidas');
-      setProximasSaidas(responseSaidas.data.slice(0, 2)); // Pegar apenas 2
-
+      setProximasSaidas(responseSaidas.data.slice(0, 2));
     } catch (error) {
       console.error('Erro ao carregar dados do perfil:', error);
     } finally {
@@ -40,7 +47,6 @@ export default function PerfilScreen() {
     }
   };
 
-  // Carregar dados quando a tela ganhar foco
   useFocusEffect(
     React.useCallback(() => {
       carregarDados();
@@ -84,7 +90,7 @@ export default function PerfilScreen() {
       </View>
 
       <View style={styles.balancoCard}>
-        <Text style={styles.balancoCardTitle}>Balanço Mensal</Text>
+        <Text style={styles.balancoCardTitle}>Previsão de saldo</Text>
         <Text style={styles.balancoValorText}>
           R$ {balanco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </Text>
@@ -94,31 +100,35 @@ export default function PerfilScreen() {
         <Text style={styles.proximasSaidasTitle}>Próximas Saídas</Text>
       </View>
 
-      <View style={styles.proximasSaidasCard}>
-        <View style={styles.horizontalCardsContainer}>
-          {proximasSaidas.length > 0 ? (
-            proximasSaidas.map((saida, index) => (
-              <View key={saida.id} style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}>
-                <Image 
-                  source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
-                  style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
-                />
-                <Text style={styles.ProximaSaidaValor}>
-                  R$ {saida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+      <TouchableOpacity 
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate('TelaFinancas')} // 👈 leva pra tela desejada
+      >
+        <View style={styles.proximasSaidasCard}>
+          <View style={styles.horizontalCardsContainer}>
+            {proximasSaidas.length > 0 ? (
+              proximasSaidas.map((saida, index) => (
+                <View key={saida.id} style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}>
+                  <Image 
+                    source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
+                    style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
+                  />
+                  <Text style={styles.ProximaSaidaValor}>
+                    R$ {saida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </Text>
+                  <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
+                </View>
+              ))
+            ) : (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: '#fff', textAlign: 'center' }}>
+                  Nenhuma saída recorrente cadastrada
                 </Text>
-                <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
-                <Text style={styles.ProximaSaidaCategoria}>({saida.categoria})</Text>
+              </View>
+            )}
           </View>
-            ))
-          ) : (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ color: '#fff', textAlign: 'center' }}>
-                Nenhuma saída recorrente cadastrada
-              </Text>
-          </View>
-          )}
         </View>
-      </View>
+      </TouchableOpacity>
     </ScrollView>
   );
 }

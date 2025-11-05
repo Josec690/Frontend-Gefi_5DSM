@@ -8,7 +8,9 @@ import Grafico from './assets/Grafico1.png';
 import TelaCadastro from './screens/TelaCadastro';
 import TelaLogin from './screens/TelaLogin';
 import Usuario from './screens/TelaUsuario';
-import TelaPerguntas from './screens/TelaPerguntas'; 
+import TelaPerguntas from './screens/TelaPerguntas';
+import TelaFinancas from './screens/TelaFinancas'; // ✅ Import da tela de finanças
+import TelaPerfil from './screens/TelaPerfil'; // ✅ Import da tela de perfil
 import styles from './styles/EstiloApp';
 
 const Stack = createNativeStackNavigator();
@@ -57,9 +59,9 @@ export default function App() {
           <Stack.Screen name="TelaPerguntas" component={TelaPerguntas} />
           <Stack.Screen name="Login" component={TelaLogin} />
           <Stack.Screen name="Usuario" component={Usuario} />
+          <Stack.Screen name="TelaFinancas" component={TelaFinancas}/>
         </Stack.Navigator>
       </NavigationContainer>
     </>
   );
 }
-
