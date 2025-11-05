@@ -5,11 +5,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Grafico from './assets/Grafico1.png';
-import TelaCadastro from './TelaCadastro';
-import TelaLogin from './TelaLogin';
-import Usuario from './TelaUsuario';
-import TelaPerguntas from './TelaPerguntas';
-import styles from './Estilos/EstiloApp';
+import TelaCadastro from './screens/TelaCadastro';
+import TelaLogin from './screens/TelaLogin';
+import Usuario from './screens/TelaUsuario';
+import TelaPerguntas from './screens/TelaPerguntas'; 
+import styles from './styles/EstiloApp';
 
 const Stack = createNativeStackNavigator();
 

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StatusBar, Image, ActivityIndicator, RefreshControl, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import api from './services/api';
-import styles from './Estilos/EstiloPerfil'; 
+import api from '../services/api';
+import styles from '../styles/EstiloPerfil'; 
 
-import perfilIcon from './assets/Perfil.png';
-import iconeSaidaGota from './assets/Gota.png'; 
-import iconeSaidaRaio from './assets/Raio.png';
+import perfilIcon from '../assets/Perfil.png';
+import iconeSaidaGota from '../assets/Gota.png'; 
+import iconeSaidaRaio from '../assets/Raio.png';
 
 export default function PerfilScreen() {
   const [usuario, setUsuario] = useState(null);
