@@ -19,7 +19,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import styles from '../styles/EstiloCadastro';
 import Grafico from '../assets/Grafico.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../services/api'; // Importa o serviço
+import api from '../services/api';
 
 const { height } = Dimensions.get('window');
 

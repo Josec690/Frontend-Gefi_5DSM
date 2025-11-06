@@ -26,6 +26,8 @@ export default function PerfilScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const navigation = useNavigation();
+
   const carregarDados = async () => {
     try {
       const responseUsuario = await api.get('/usuario');
@@ -39,6 +41,7 @@ export default function PerfilScreen() {
 
       const responseSaidas = await api.get('/proximas-saidas');
       setProximasSaidas(responseSaidas.data.slice(0, 2));
+
     } catch (error) {
       console.error('Erro ao carregar dados do perfil:', error);
     } finally {
@@ -81,14 +84,19 @@ export default function PerfilScreen() {
     >
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
+      {/* NAVBAR COM BOTÃO DE PERFIL */}
       <View style={styles.navbar}>
-        <Image source={perfilIcon} style={styles.profileIcon} />
+        <TouchableOpacity onPress={() => navigation.navigate('PerfilUser')}>
+          <Image source={perfilIcon} style={styles.profileIcon} />
+        </TouchableOpacity>
+
         <View style={styles.userInfo}>
           <Text style={styles.welcomeText}>Bem-vindo, {usuario?.nome || 'Usuário'}</Text>
           <Text style={styles.cpfText}>{formatarCPF(usuario?.cpf)}</Text>
         </View>
       </View>
 
+      {/* CARD DO BALANÇO */}
       <View style={styles.balancoCard}>
         <Text style={styles.balancoCardTitle}>Previsão de saldo</Text>
         <Text style={styles.balancoValorText}>
@@ -96,6 +104,7 @@ export default function PerfilScreen() {
         </Text>
       </View>
 
+      {/* TÍTULO PRÓXIMAS SAÍDAS */}
       <View style={styles.proximasSaidasTitleContainer}>
         <Text style={styles.proximasSaidasTitle}>Próximas Saídas</Text>
       </View>
@@ -127,6 +136,33 @@ export default function PerfilScreen() {
               </View>
             )}
           </View>
+      {/* CARDS PRÓXIMAS SAÍDAS */}
+      <View style={styles.proximasSaidasCard}>
+        <View style={styles.horizontalCardsContainer}>
+          {proximasSaidas.length > 0 ? (
+            proximasSaidas.map((saida, index) => (
+              <View 
+                key={saida.id} 
+                style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}
+              >
+                <Image 
+                  source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
+                  style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
+                />
+                <Text style={styles.ProximaSaidaValor}>
+                  R$ {saida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </Text>
+                <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
+                <Text style={styles.ProximaSaidaCategoria}>({saida.categoria})</Text>
+              </View>
+            ))
+          ) : (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{ color: '#fff', textAlign: 'center' }}>
+                Nenhuma saída recorrente cadastrada
+              </Text>
+            </View>
+          )}
         </View>
       </TouchableOpacity>
     </ScrollView>

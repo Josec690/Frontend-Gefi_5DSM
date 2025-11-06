@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 
 // URL do backend baseada na plataforma
 const getBaseURL = () => {  
-    return 'http://192.168.18.58:5000/api'; // Colocar o IP da maquina Atual - Android   
+    return 'http://192.168.15.42:5000/api'; // Colocar o IP da maquina Atual - Android   
 };
 //
 const api = axios.create({
