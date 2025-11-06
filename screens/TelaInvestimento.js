@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import api from './services/api';
-import styles from './Estilos/EstiloInvestimento';
+import api from '../services/api';
+import styles from '../styles/EstiloInvestimento';
 
 
 export default function InvestScreen() {

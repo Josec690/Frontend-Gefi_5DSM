@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StatusBar, Image, ActivityIndicator, RefreshControl, ScrollView } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import api from './services/api';
-import styles from './Estilos/EstiloPerfil'; 
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StatusBar, 
+  Image, 
+  ActivityIndicator, 
+  RefreshControl, 
+  ScrollView, 
+  TouchableOpacity 
+} from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import api from '../services/api';
+import styles from '../styles/EstiloPerfil'; 
 
-import perfilIcon from './assets/Perfil.png';
-import iconeSaidaGota from './assets/Gota.png'; 
-import iconeSaidaRaio from './assets/Raio.png';
+import perfilIcon from '../assets/Perfil.png';
+import iconeSaidaGota from '../assets/Gota.png'; 
+import iconeSaidaRaio from '../assets/Raio.png';
 
 export default function PerfilScreen() {
   const [usuario, setUsuario] = useState(null);
@@ -15,22 +24,21 @@ export default function PerfilScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const navigation = useNavigation();
+
   const carregarDados = async () => {
     try {
-      // Buscar dados do usuário
       const responseUsuario = await api.get('/usuario');
       setUsuario(responseUsuario.data);
 
-      // Buscar balanço mensal
       const hoje = new Date();
       const mes = hoje.getMonth() + 1;
       const ano = hoje.getFullYear();
       const responseBalanco = await api.get(`/balanco?mes=${mes}&ano=${ano}`);
       setBalanco(responseBalanco.data.balanco);
 
-      // Buscar próximas saídas
       const responseSaidas = await api.get('/proximas-saidas');
-      setProximasSaidas(responseSaidas.data.slice(0, 2)); // Pegar apenas 2
+      setProximasSaidas(responseSaidas.data.slice(0, 2));
 
     } catch (error) {
       console.error('Erro ao carregar dados do perfil:', error);
@@ -40,7 +48,6 @@ export default function PerfilScreen() {
     }
   };
 
-  // Carregar dados quando a tela ganhar foco
   useFocusEffect(
     React.useCallback(() => {
       carregarDados();
@@ -75,14 +82,19 @@ export default function PerfilScreen() {
     >
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
+      {/* NAVBAR COM BOTÃO DE PERFIL */}
       <View style={styles.navbar}>
-        <Image source={perfilIcon} style={styles.profileIcon} />
+        <TouchableOpacity onPress={() => navigation.navigate('PerfilUser')}>
+          <Image source={perfilIcon} style={styles.profileIcon} />
+        </TouchableOpacity>
+
         <View style={styles.userInfo}>
           <Text style={styles.welcomeText}>Bem-vindo, {usuario?.nome || 'Usuário'}</Text>
           <Text style={styles.cpfText}>{formatarCPF(usuario?.cpf)}</Text>
         </View>
       </View>
 
+      {/* CARD DO BALANÇO */}
       <View style={styles.balancoCard}>
         <Text style={styles.balancoCardTitle}>Balanço Mensal</Text>
         <Text style={styles.balancoValorText}>
@@ -90,15 +102,20 @@ export default function PerfilScreen() {
         </Text>
       </View>
 
+      {/* TÍTULO PRÓXIMAS SAÍDAS */}
       <View style={styles.proximasSaidasTitleContainer}>
         <Text style={styles.proximasSaidasTitle}>Próximas Saídas</Text>
       </View>
 
+      {/* CARDS PRÓXIMAS SAÍDAS */}
       <View style={styles.proximasSaidasCard}>
         <View style={styles.horizontalCardsContainer}>
           {proximasSaidas.length > 0 ? (
             proximasSaidas.map((saida, index) => (
-              <View key={saida.id} style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}>
+              <View 
+                key={saida.id} 
+                style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}
+              >
                 <Image 
                   source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
                   style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
@@ -108,14 +125,14 @@ export default function PerfilScreen() {
                 </Text>
                 <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
                 <Text style={styles.ProximaSaidaCategoria}>({saida.categoria})</Text>
-          </View>
+              </View>
             ))
           ) : (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <Text style={{ color: '#fff', textAlign: 'center' }}>
                 Nenhuma saída recorrente cadastrada
               </Text>
-          </View>
+            </View>
           )}
         </View>
       </View>

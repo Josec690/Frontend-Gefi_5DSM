@@ -6,47 +6,39 @@ import {
   TouchableOpacity,
   StatusBar,
   Image,
-  Platform,
   KeyboardAvoidingView,
-  TouchableWithoutFeedback,
+  Platform,
   Keyboard,
+  TouchableWithoutFeedback,
   Alert,
   ActivityIndicator,
   Animated,
   Dimensions,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import styles from './Estilos/EstiloCadastro';
-import Grafico from './assets/Grafico.png';
+import styles from '../styles/EstiloLogin';
+import Grafico from '../assets/Grafico2.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from './services/api';
+import api from '../services/api'; // Importa o serviço
 
 const { height } = Dimensions.get('window');
 
-export default function TelaCadastro({ navigation }) {
-  const [nome, setNome] = useState('');
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
-  const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const [nomeErro, setNomeErro] = useState('');
   const [emailErro, setEmailErro] = useState('');
-  const [cpfErro, setCpfErro] = useState('');
   const [senhaErro, setSenhaErro] = useState('');
-
-  const emailRef = useRef(null);
-  const cpfRef = useRef(null);
-  const senhaRef = useRef(null);
-
   const translateY = useRef(new Animated.Value(0)).current;
+
+  const senhaRef = useRef(null);
 
   useEffect(() => {
     StatusBar.setBackgroundColor('#000');
     StatusBar.setBarStyle('light-content');
   }, []);
 
-  // animação leve quando o teclado abre
+  // leve animação opcional (só pra dar "suavidade")
   useEffect(() => {
     const show = Keyboard.addListener('keyboardDidShow', (e) => {
       const keyboardHeight = e.endCoordinates?.height || 300;
@@ -57,7 +49,6 @@ export default function TelaCadastro({ navigation }) {
         useNativeDriver: true,
       }).start();
     });
-
     const hide = Keyboard.addListener('keyboardDidHide', () => {
       Animated.timing(translateY, {
         toValue: 0,
@@ -65,53 +56,51 @@ export default function TelaCadastro({ navigation }) {
         useNativeDriver: true,
       }).start();
     });
-
     return () => {
       show.remove();
       hide.remove();
     };
   }, [translateY]);
 
-  const handleCadastro = async () => {
-    setNomeErro('');
+  const handleLogin = async () => {
     setEmailErro('');
-    setCpfErro('');
     setSenhaErro('');
-
     let hasError = false;
-    if (!nome.trim()) { setNomeErro('Esse campo precisa ser preenchido!'); hasError = true; }
     if (!email.trim()) { setEmailErro('Esse campo precisa ser preenchido!'); hasError = true; }
-    if (!cpf.trim()) { setCpfErro('Esse campo precisa ser preenchido!'); hasError = true; }
     if (!senha.trim()) { setSenhaErro('Esse campo precisa ser preenchido!'); hasError = true; }
-
     if (hasError) return;
 
     setLoading(true);
     try {
-      const response = await api.post('/cadastro', {
-        nome: nome.trim(),
+      const response = await api.post('/login', {
         email: email.trim().toLowerCase(),
-        cpf: cpf.trim(),
         senha,
       });
-
       await AsyncStorage.setItem('token', response.data.token);
-      await AsyncStorage.setItem('usuario_id', response.data.usuario_id);
-
-      Alert.alert('Sucesso!', 'Cadastro realizado com sucesso!');
-      navigation.navigate('TelaPerguntas');
+      await AsyncStorage.setItem('user', JSON.stringify(response.data.usuario));
+      Alert.alert('Sucesso!', 'Login realizado com sucesso!');
+      navigation.navigate('Usuario');
     } catch (error) {
-      console.error('Erro no cadastro:', error);
+      console.error('Erro no login:', error);
       if (error.response) {
-        Alert.alert('Erro', error.response.data.erro || 'Erro ao cadastrar');
+        Alert.alert('Erro', error.response.data.erro || 'Email ou senha incorretos');
       } else if (error.request) {
-        Alert.alert('Erro', 'Não foi possível conectar ao servidor. Verifique sua conexão.');
+        Alert.alert('Erro', 'Não foi possível conectar ao servidor');
       } else {
-        Alert.alert('Erro', 'Erro ao processar cadastro');
+        Alert.alert('Erro', 'Erro ao processar login');
       }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    // Aqui você pode navegar para uma tela de recuperação
+    // Exemplo: navigation.navigate('RecuperarSenha');
+    Alert.alert(
+      'Recuperar senha',
+      'Função em desenvolvimento.\nEm breve você poderá redefinir sua senha.'
+    );
   };
 
   return (
@@ -123,9 +112,8 @@ export default function TelaCadastro({ navigation }) {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAwareScrollView
           enableOnAndroid={true}
-          extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
+          extraScrollHeight={Platform.OS === 'android' ? 120 : 60} // ajusta quanto rola acima do input
           keyboardOpeningTime={0}
-          resetScrollToCoords={{ x: 0, y: 0 }}
           contentContainerStyle={{
             flexGrow: 1,
             minHeight: height,
@@ -135,6 +123,7 @@ export default function TelaCadastro({ navigation }) {
             backgroundColor: '#000',
           }}
           showsVerticalScrollIndicator={false}
+          resetScrollToCoords={{ x: 0, y: 0 }} // garante voltar ao topo/centro quando teclado fecha
         >
           <Animated.View
             style={{
@@ -149,41 +138,20 @@ export default function TelaCadastro({ navigation }) {
               <Text style={styles.title}>Gefi</Text>
             </View>
 
-            <Text style={styles.text}>
-              Bem-vindo ao começo de uma vida financeira saudável
-            </Text>
-
+            <Text style={styles.text}>Que bom te ver por aqui!</Text>
             <Image source={Grafico} style={styles.image} />
 
-            {/* NOME */}
-            <View style={{ width: '100%', marginBottom: 15 }}>
-              {nomeErro ? <Text style={styles.errorText}>{nomeErro}</Text> : null}
-              <TextInput
-                style={styles.input}
-                placeholder=" Nome"
-                placeholderTextColor="#ccc"
-                value={nome}
-                onChangeText={setNome}
-                returnKeyType="next"
-                onSubmitEditing={() => emailRef.current?.focus()}
-                blurOnSubmit={false}
-                editable={!loading}
-              />
-            </View>
-
-            {/* EMAIL */}
             <View style={{ width: '100%', marginBottom: 15 }}>
               {emailErro ? <Text style={styles.errorText}>{emailErro}</Text> : null}
               <TextInput
-                ref={emailRef}
-                style={styles.input}
+                style={styles.inputEmail}
                 placeholder=" E-mail"
                 placeholderTextColor="#ccc"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 returnKeyType="next"
-                onSubmitEditing={() => cpfRef.current?.focus()}
+                onSubmitEditing={() => senhaRef.current?.focus()}
                 blurOnSubmit={false}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -191,52 +159,43 @@ export default function TelaCadastro({ navigation }) {
               />
             </View>
 
-            {/* CPF */}
-            <View style={{ width: '100%', marginBottom: 15 }}>
-              {cpfErro ? <Text style={styles.errorText}>{cpfErro}</Text> : null}
-              <TextInput
-                ref={cpfRef}
-                style={styles.input}
-                placeholder=" CPF"
-                placeholderTextColor="#ccc"
-                value={cpf}
-                onChangeText={setCpf}
-                keyboardType="numeric"
-                returnKeyType="next"
-                onSubmitEditing={() => senhaRef.current?.focus()}
-                blurOnSubmit={false}
-                editable={!loading}
-              />
-            </View>
-
-            {/* SENHA */}
             <View style={{ width: '100%', marginBottom: 15 }}>
               {senhaErro ? <Text style={styles.errorText}>{senhaErro}</Text> : null}
               <TextInput
                 ref={senhaRef}
-                style={styles.input}
+                style={styles.inputSenha}
                 placeholder=" Senha"
                 placeholderTextColor="#ccc"
                 value={senha}
                 onChangeText={setSenha}
                 secureTextEntry
                 returnKeyType="done"
-                onSubmitEditing={handleCadastro}
+                onSubmitEditing={handleLogin}
                 editable={!loading}
               />
             </View>
 
-            {/* BOTÃO */}
+      {/* 🔗 Link de esqueci minha senha */}
+      <TouchableOpacity onPress={handleForgotPassword} style={{ alignSelf: 'flex-end', marginBottom: 20 }}>
+        <Text style={{ color: '#00BFFF', fontSize: 14 }}>Esqueci minha senha?</Text>
+      </TouchableOpacity>
+
             <TouchableOpacity
               style={[styles.button, loading && { opacity: 0.5 }]}
-              onPress={handleCadastro}
+              onPress={handleLogin}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Cadastrar</Text>
+                <Text style={styles.buttonText}>Entrar</Text>
               )}
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
+              <Text style={styles.linkText}>
+                Ainda não tem uma conta? Cadastre-se
+              </Text>
             </TouchableOpacity>
           </Animated.View>
         </KeyboardAwareScrollView>

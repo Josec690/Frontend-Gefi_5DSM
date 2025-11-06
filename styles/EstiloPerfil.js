@@ -7,7 +7,7 @@ const styles = {
   navbar: {
     width: '100%',
     height: 140, 
-    backgroundColor: '#006600', 
+    backgroundColor: '#000000ff', 
     flexDirection: 'column', 
     alignItems: 'flex-start',
     paddingHorizontal: 15,
@@ -29,7 +29,9 @@ const styles = {
   welcomeText: {
     fontSize: 15,
     color: '#fff', 
-    marginLeft: -15, 
+    marginLeft: 50,
+    marginTop: -50
+     
   },
 
   cpfText: {

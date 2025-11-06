@@ -5,11 +5,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Grafico from './assets/Grafico1.png';
-import TelaCadastro from './TelaCadastro';
-import TelaLogin from './TelaLogin';
-import Usuario from './TelaUsuario';
-import TelaPerguntas from './TelaPerguntas';
-import styles from './Estilos/EstiloApp';
+import TelaCadastro from './screens/TelaCadastro';
+import TelaLogin from './screens/TelaLogin';
+import Usuario from './screens/TelaUsuario';
+import TelaPerguntas from './screens/TelaPerguntas'; 
+import styles from './styles/EstiloApp';
+import TelaPerfilUser from './screens/TelaPerfilUser';
+import TelaConfig from './screens/TelaConfig';
+import TelaAlterarSenha from './screens/TelaAlterarSenha';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +61,10 @@ export default function App() {
           <Stack.Screen name="TelaPerguntas" component={TelaPerguntas} />
           <Stack.Screen name="Login" component={TelaLogin} />
           <Stack.Screen name="Usuario" component={Usuario} />
+          <Stack.Screen name="PerfilUser" component={TelaPerfilUser} />
+          <Stack.Screen name="Config" component={TelaConfig} />
+          <Stack.Screen name="AlterarSenha" component={TelaAlterarSenha} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </>

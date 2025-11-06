@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, useWindowDimensions, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import api from './services/api';
-import styles from './Estilos/EstiloPerguntas';
+import api from '../services/api';
+import styles from '../styles/EstiloPerguntas';
 
 const questions = [
   {
