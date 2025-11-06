@@ -3,8 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 // URL do backend baseada na plataforma
-const getBaseURL = () => {  
-    return 'http://192.168.15.42:5000/api'; // Colocar o IP da maquina Atual - Android   
+const getBaseURL = () => {
+    return 'http://<IP_DA_MAQUINA>:5000/api'; // Colocar o IP da maquina Atual - Androidcmd
+
+    
 };
 //
 const api = axios.create({

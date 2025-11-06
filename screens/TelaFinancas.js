@@ -1,26 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StatusBar,
   TouchableOpacity,
   Modal,
-  Pressable,
+  TouchableWithoutFeedback,
   TextInput,
   Alert,
   ScrollView,
   ActivityIndicator,
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import api from '../services/api';
 import styles from '../styles/EstiloFinancas';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export default function TelaFinancas() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [tipoTransacao, setTipoTransacao] = useState('');
+  const scrollRef = useRef(null);
 
   // Modal Bottom Sheet para atualizar
   const [modalAtualizarVisible, setModalAtualizarVisible] = useState(false);
@@ -56,6 +60,18 @@ export default function TelaFinancas() {
       carregarTransacoes();
     }, [])
   );
+
+  useEffect(() => {
+    const s = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const h = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+      // quando teclado fechar, resetar scroll do modal para posição inicial
+      if (scrollRef.current && typeof scrollRef.current.scrollToPosition === 'function') {
+        scrollRef.current.scrollToPosition(0, 0, true);
+      }
+    });
+    return () => { s.remove(); h.remove(); };
+  }, []);
 
   const handleAbrirModal = (tipo) => {
     setTipoTransacao(tipo);
@@ -222,10 +238,10 @@ export default function TelaFinancas() {
         visible={modalAtualizarVisible}
         onRequestClose={() => setModalAtualizarVisible(false)}
       >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setModalAtualizarVisible(false)}
-        >
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback onPress={() => setModalAtualizarVisible(false)}>
+            <View style={{ flex: 1 }} />
+          </TouchableWithoutFeedback>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={[
@@ -262,24 +278,34 @@ export default function TelaFinancas() {
               <Text style={styles.modalButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </KeyboardAvoidingView>
-        </Pressable>
+        </View>
       </Modal>
 
       {/* MODAL: Cadastro Entrada/Saída */}
-<Modal
-  animationType="slide"
-  transparent={true}
-  visible={modalVisible}
-  onRequestClose={handleCloseModal}
->
-  <Pressable style={styles.modalOverlay} >
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback onPress={handleCloseModal}>
+            <View style={{ flex: 1 }} />
+          </TouchableWithoutFeedback>
+      <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    keyboardVerticalOffset={Platform.OS === 'android' ? 110 : 70}
       style={[styles.modalContent, { maxHeight: '100%' }]}
     >
-      <ScrollView
+      {/* ref para permitir scroll programático, e aumento do extraScrollHeight para evitar campos cobrirem */}
+      <KeyboardAwareScrollView
+        ref={scrollRef}
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'android' ? 200 : 120}
+        keyboardOpeningTime={0}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: Platform.OS === 'android' ? 240 : 140 }}
       >
         <Text style={styles.modalTitle}>
           {tipoTransacao === 'entrada' ? 'Nova Entrada' : 'Nova Saída'}
@@ -371,10 +397,10 @@ export default function TelaFinancas() {
         >
           <Text style={styles.modalButtonText}>Cancelar</Text>
         </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  </Pressable>
-</Modal>
+      </KeyboardAwareScrollView>
+      </KeyboardAvoidingView>
+    </View>
+  </Modal>
 
     </View>
   );

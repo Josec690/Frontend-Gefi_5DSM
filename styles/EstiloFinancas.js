@@ -52,17 +52,17 @@ export default StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-    marginTop: 450
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end', // posiciona o card na parte inferior
   },
   modalContent: {
-    backgroundColor: '#000', 
+    backgroundColor: '#000',
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderColor: 'rgba(129, 199, 132, 0.4)',
     borderWidth: 2,
-    height: 450,
+    maxHeight: '70%', // permite que o conteúdo suba quando o teclado aparece
   },
   modalTitle: {
     fontSize: 18,

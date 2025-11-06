@@ -135,7 +135,9 @@ export default function LoginScreen({ navigation }) {
             <StatusBar barStyle="light-content" backgroundColor="#000" />
 
             <View style={styles.header}>
-              <Text style={styles.title}>Gefi</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Cadastro')} accessibilityRole="button">
+                <Text style={styles.title}>Gefi</Text>
+              </TouchableOpacity>
             </View>
 
             <Text style={styles.text}>Que bom te ver por aqui!</Text>

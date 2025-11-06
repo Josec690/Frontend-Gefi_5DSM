@@ -24,16 +24,21 @@ export default function TelaAlterarSenha() {
 
     try {
       // Chamada à API para alterar a senha
-      await api.put('/usuario/senha', {
-        senhaAtual,
-        novaSenha
+      const response = await api.put('/mudar-senha', {
+        senha_atual: senhaAtual,
+        senha_nova: novaSenha
       });
-
-      Alert.alert('Sucesso', 'Senha alterada com sucesso!');
+      Alert.alert('Sucesso', response.data.mensagem || 'Senha alterada com sucesso!');
       navigation.goBack();
     } catch (error) {
       console.error('Erro ao alterar a senha:', error);
-      Alert.alert('Erro', 'Não foi possível alterar a senha.');
+      // Tentar mostrar mensagem do servidor quando disponível
+      const serverMsg = error.response?.data?.erro || error.response?.data?.message;
+      if (serverMsg) {
+        Alert.alert('Erro', serverMsg);
+      } else {
+        Alert.alert('Erro', 'Não foi possível alterar a senha.');
+      }
     }
   };
 
