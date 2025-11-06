@@ -18,15 +18,13 @@ import iconeSaidaGota from '../assets/Gota.png';
 import iconeSaidaRaio from '../assets/Raio.png';
 
 export default function PerfilScreen() {
-  const navigation = useNavigation(); // 👈 Hook para navegar entre telas
+  const navigation = useNavigation(); // ✅ apenas uma declaração
 
   const [usuario, setUsuario] = useState(null);
   const [balanco, setBalanco] = useState(0);
   const [proximasSaidas, setProximasSaidas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
-  const navigation = useNavigation();
 
   const carregarDados = async () => {
     try {
@@ -36,6 +34,7 @@ export default function PerfilScreen() {
       const hoje = new Date();
       const mes = hoje.getMonth() + 1;
       const ano = hoje.getFullYear();
+
       const responseBalanco = await api.get(`/balanco?mes=${mes}&ano=${ano}`);
       setBalanco(responseBalanco.data.balanco);
 
@@ -109,15 +108,19 @@ export default function PerfilScreen() {
         <Text style={styles.proximasSaidasTitle}>Próximas Saídas</Text>
       </View>
 
+      {/* CARDS PRÓXIMAS SAÍDAS */}
       <TouchableOpacity 
         activeOpacity={0.8}
-        onPress={() => navigation.navigate('TelaFinancas')} // 👈 leva pra tela desejada
+        onPress={() => navigation.navigate('TelaFinancas')}
       >
         <View style={styles.proximasSaidasCard}>
           <View style={styles.horizontalCardsContainer}>
             {proximasSaidas.length > 0 ? (
               proximasSaidas.map((saida, index) => (
-                <View key={saida.id} style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}>
+                <View 
+                  key={saida.id} 
+                  style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}
+                >
                   <Image 
                     source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
                     style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
@@ -126,6 +129,7 @@ export default function PerfilScreen() {
                     R$ {saida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </Text>
                   <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
+                  <Text style={styles.ProximaSaidaCategoria}>({saida.categoria})</Text>
                 </View>
               ))
             ) : (
@@ -136,33 +140,6 @@ export default function PerfilScreen() {
               </View>
             )}
           </View>
-      {/* CARDS PRÓXIMAS SAÍDAS */}
-      <View style={styles.proximasSaidasCard}>
-        <View style={styles.horizontalCardsContainer}>
-          {proximasSaidas.length > 0 ? (
-            proximasSaidas.map((saida, index) => (
-              <View 
-                key={saida.id} 
-                style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}
-              >
-                <Image 
-                  source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
-                  style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
-                />
-                <Text style={styles.ProximaSaidaValor}>
-                  R$ {saida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </Text>
-                <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
-                <Text style={styles.ProximaSaidaCategoria}>({saida.categoria})</Text>
-              </View>
-            ))
-          ) : (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ color: '#fff', textAlign: 'center' }}>
-                Nenhuma saída recorrente cadastrada
-              </Text>
-            </View>
-          )}
         </View>
       </TouchableOpacity>
     </ScrollView>
