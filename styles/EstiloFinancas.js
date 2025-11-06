@@ -187,4 +187,31 @@ export default StyleSheet.create({
     textAlign: 'center',
     padding: 20,
   },
+  botaoFlutuante: {
+  position: 'absolute',
+  bottom: 150, // distância da parte inferior da tela
+  alignSelf: 'center', 
+  width: 261,
+  height: 40,
+  backgroundColor: 'rgba(8, 156, 8, 0.6)',
+  borderWidth: 1,
+  borderColor: 'rgba(129, 199, 132, 0.4)',
+  borderTopLeftRadius: 0,
+  borderTopRightRadius: 20,
+  borderBottomLeftRadius: 20,
+  borderBottomRightRadius: 0,
+  justifyContent: 'center',
+  alignItems: 'center',
+  shadowColor: '#000', // sombra leve
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 3,
+  elevation: 4, // sombra no Android
+},
+botaoFlutuanteTexto: {
+  color: '#fff',
+  fontWeight: 'bold',
+  fontSize: 16,
+},
+
 });

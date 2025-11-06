@@ -10,23 +10,26 @@ import {
   Alert,
   ScrollView,
   ActivityIndicator,
-  FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import api from './services/api';
-import styles from './Estilos/EstiloFinancas';
+import api from '../services/api';
+import styles from '../styles/EstiloFinancas';
 
 export default function TelaFinancas() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [tipoTransacao, setTipoTransacao] = useState(''); // 'entrada' ou 'saida'
-  const [modalListaVisible, setModalListaVisible] = useState(false);
-  
+  const [tipoTransacao, setTipoTransacao] = useState('');
+
+  // Modal Bottom Sheet para atualizar
+  const [modalAtualizarVisible, setModalAtualizarVisible] = useState(false);
+
   // Dados do formulário
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
   const [categoria, setCategoria] = useState('');
   const [ehRecorrente, setEhRecorrente] = useState(false);
-  
+
   // Listas
   const [entradas, setEntradas] = useState([]);
   const [saidas, setSaidas] = useState([]);
@@ -36,7 +39,7 @@ export default function TelaFinancas() {
     try {
       const [responseEntradas, responseSaidas] = await Promise.all([
         api.get('/entradas'),
-        api.get('/saidas')
+        api.get('/saidas'),
       ]);
       setEntradas(responseEntradas.data);
       setSaidas(responseSaidas.data);
@@ -54,7 +57,6 @@ export default function TelaFinancas() {
   const handleAbrirModal = (tipo) => {
     setTipoTransacao(tipo);
     setModalVisible(true);
-    // Limpar campos
     setDescricao('');
     setValor('');
     setCategoria('');
@@ -145,10 +147,18 @@ export default function TelaFinancas() {
         </Text>
       </View>
       <View style={{ alignItems: 'flex-end' }}>
-        <Text style={[styles.transacaoValor, tipo === 'entrada' ? styles.valorPositivo : styles.valorNegativo]}>
+        <Text
+          style={[
+            styles.transacaoValor,
+            tipo === 'entrada' ? styles.valorPositivo : styles.valorNegativo,
+          ]}
+        >
           {tipo === 'entrada' ? '+' : '-'} R$ {item.valor.toFixed(2)}
         </Text>
-        <TouchableOpacity onPress={() => handleDeletar(item.id, tipo)} style={styles.botaoDeletar}>
+        <TouchableOpacity
+          onPress={() => handleDeletar(item.id, tipo)}
+          style={styles.botaoDeletar}
+        >
           <Text style={styles.textoDeletar}>Deletar</Text>
         </TouchableOpacity>
       </View>
@@ -166,21 +176,86 @@ export default function TelaFinancas() {
         Aqui você pode controlar suas finanças de forma simples e eficiente.
       </Text>
 
-      <View style={{ flexDirection: 'column', justifyContent: 'space-between', marginVertical: 80 }}>
-        <TouchableOpacity style={styles.button} onPress={() => handleAbrirModal('entrada')}>
-          <Text style={styles.buttonText}>+ Entrada</Text>
-        </TouchableOpacity>
+      {/* 📊 Listagem de transações direto na tela */}
+      <ScrollView style={{ flex: 1, marginBottom: 90 }}>
+        <Text style={styles.secaoTitulo}>Entradas</Text>
+        {entradas.length > 0 ? (
+          entradas.map((item) => (
+            <View key={item.id}>{renderItem({ item, tipo: 'entrada' })}</View>
+          ))
+        ) : (
+          <Text style={styles.textoVazio}>Nenhuma entrada cadastrada</Text>
+        )}
 
-        <TouchableOpacity style={styles.button} onPress={() => handleAbrirModal('saida')}>
-          <Text style={styles.buttonText}>+ Saída</Text>
-        </TouchableOpacity>
-      </View>
+        <Text style={[styles.secaoTitulo, { marginTop: 20 }]}>Saídas</Text>
+        {saidas.length > 0 ? (
+          saidas.map((item) => (
+            <View key={item.id}>{renderItem({ item, tipo: 'saida' })}</View>
+          ))
+        ) : (
+          <Text style={styles.textoVazio}>Nenhuma saída cadastrada</Text>
+        )}
+      </ScrollView>
 
-      <TouchableOpacity style={styles.button} onPress={() => setModalListaVisible(true)}>
-        <Text style={styles.buttonText}>Ver Transações</Text>
+      {/* 🟢 Botão flutuante Atualizar */}
+      <TouchableOpacity
+        style={styles.botaoFlutuante}
+        onPress={() => setModalAtualizarVisible(true)}
+      >
+        <Text style={styles.botaoFlutuanteTexto}>Atualizar</Text>
       </TouchableOpacity>
 
-      {/* Modal de Cadastro */}
+      {/* MODAL: Bottom Sheet Atualizar */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalAtualizarVisible}
+        onRequestClose={() => setModalAtualizarVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setModalAtualizarVisible(false)}
+        >
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={[
+              styles.modalContent,
+              { alignItems: 'center', justifyContent: 'center', gap: 20 },
+            ]}
+          >
+            <Text style={styles.modalTitle}>O que deseja atualizar?</Text>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setModalAtualizarVisible(false);
+                handleAbrirModal('entrada');
+              }}
+            >
+              <Text style={styles.buttonText}>+ Entrada</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setModalAtualizarVisible(false);
+                handleAbrirModal('saida');
+              }}
+            >
+              <Text style={styles.buttonText}>- Saída</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.modalButtonCancelar}
+              onPress={() => setModalAtualizarVisible(false)}
+            >
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+        </Pressable>
+      </Modal>
+
+      {/* MODAL: Cadastro Entrada/Saída */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -188,7 +263,10 @@ export default function TelaFinancas() {
         onRequestClose={handleCloseModal}
       >
         <Pressable style={styles.modalOverlay} onPress={handleCloseModal}>
-          <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.modalContent}
+          >
             <Text style={styles.modalTitle}>
               {tipoTransacao === 'entrada' ? 'Nova Entrada' : 'Nova Saída'}
             </Text>
@@ -223,7 +301,9 @@ export default function TelaFinancas() {
                 style={styles.checkboxContainer}
                 onPress={() => setEhRecorrente(!ehRecorrente)}
               >
-                <View style={[styles.checkbox, ehRecorrente && styles.checkboxMarcado]} />
+                <View
+                  style={[styles.checkbox, ehRecorrente && styles.checkboxMarcado]}
+                />
                 <Text style={styles.checkboxTexto}>É uma despesa recorrente?</Text>
               </TouchableOpacity>
             )}
@@ -240,52 +320,14 @@ export default function TelaFinancas() {
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.modalButtonCancelar} onPress={handleCloseModal}>
+            <TouchableOpacity
+              style={styles.modalButtonCancelar}
+              onPress={handleCloseModal}
+            >
               <Text style={styles.modalButtonText}>Cancelar</Text>
             </TouchableOpacity>
-          </Pressable>
+          </KeyboardAvoidingView>
         </Pressable>
-      </Modal>
-
-      {/* Modal de Lista */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalListaVisible}
-        onRequestClose={() => setModalListaVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { height: '80%' }]}>
-            <Text style={styles.modalTitle}>Transações</Text>
-
-            <ScrollView style={{ flex: 1 }}>
-              <Text style={styles.secaoTitulo}>Entradas</Text>
-              {entradas.length > 0 ? (
-                entradas.map((item) => (
-                  <View key={item.id}>{renderItem({ item, tipo: 'entrada' })}</View>
-                ))
-              ) : (
-                <Text style={styles.textoVazio}>Nenhuma entrada cadastrada</Text>
-              )}
-
-              <Text style={[styles.secaoTitulo, { marginTop: 20 }]}>Saídas</Text>
-              {saidas.length > 0 ? (
-                saidas.map((item) => (
-                  <View key={item.id}>{renderItem({ item, tipo: 'saida' })}</View>
-                ))
-              ) : (
-                <Text style={styles.textoVazio}>Nenhuma saída cadastrada</Text>
-              )}
-            </ScrollView>
-
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => setModalListaVisible(false)}
-            >
-              <Text style={styles.modalButtonText}>Fechar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
       </Modal>
     </View>
   );

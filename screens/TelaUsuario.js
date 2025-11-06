@@ -6,7 +6,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import PerfilScreen from './TelaPerfil';
 import InvestScreen from './TelaInvestimento';
 import FinancasScreen from './TelaFinancas';
-import styles from './Estilos/EstiloPerfil';
+import styles from '../styles/EstiloPerfil';
 
 const Tab = createBottomTabNavigator();
 
