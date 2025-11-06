@@ -14,6 +14,7 @@ import {
   Platform,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import api from '../services/api';
 import styles from '../styles/EstiloFinancas';
 
@@ -29,6 +30,8 @@ export default function TelaFinancas() {
   const [valor, setValor] = useState('');
   const [categoria, setCategoria] = useState('');
   const [ehRecorrente, setEhRecorrente] = useState(false);
+  const [dataRecorrencia, setDataRecorrencia] = useState(new Date());
+  const [mostrarDatePicker, setMostrarDatePicker] = useState(false);
 
   // Listas
   const [entradas, setEntradas] = useState([]);
@@ -61,6 +64,7 @@ export default function TelaFinancas() {
     setValor('');
     setCategoria('');
     setEhRecorrente(false);
+    setDataRecorrencia(new Date());
   };
 
   const handleCloseModal = () => {
@@ -68,46 +72,53 @@ export default function TelaFinancas() {
     setTipoTransacao('');
   };
 
-  const handleSalvar = async () => {
-    if (!descricao.trim() || !valor.trim()) {
-      Alert.alert('Erro', 'Preencha todos os campos obrigatórios');
-      return;
-    }
+ const handleSalvar = async () => {
+  if (!descricao.trim() || !valor.trim()) {
+    Alert.alert('Erro', 'Preencha todos os campos obrigatórios');
+    return;
+  }
 
-    const valorNumerico = parseFloat(valor.replace(',', '.'));
-    if (isNaN(valorNumerico) || valorNumerico <= 0) {
-      Alert.alert('Erro', 'Valor inválido');
-      return;
-    }
+  const valorNumerico = parseFloat(valor.replace(',', '.'));
+  if (isNaN(valorNumerico) || valorNumerico <= 0) {
+    Alert.alert('Erro', 'Valor inválido');
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const dados = {
-        descricao: descricao.trim(),
-        valor: valorNumerico,
-        categoria: categoria.trim() || 'Outros',
-        data: new Date().toISOString(),
-      };
+  try {
+    const dados = {
+      descricao: descricao.trim(),
+      valor: valorNumerico,
+      categoria: categoria.trim() || 'Outros',
+      data: new Date().toISOString(), 
+    };
 
-      if (tipoTransacao === 'saida') {
-        dados.eh_recorrente = ehRecorrente;
-        await api.post('/saida', dados);
-        Alert.alert('Sucesso', 'Saída cadastrada com sucesso!');
-      } else {
-        await api.post('/entrada', dados);
-        Alert.alert('Sucesso', 'Entrada cadastrada com sucesso!');
+    if (tipoTransacao === 'saida') {
+      dados.eh_recorrente = ehRecorrente;
+
+      if (ehRecorrente) {
+        const dataISO = dataRecorrencia.toISOString();
+        dados.data_primeira_recorrencia = dataISO;
+        dados.data = dataISO; 
       }
 
-      handleCloseModal();
-      carregarTransacoes();
-    } catch (error) {
-      console.error('Erro ao salvar:', error);
-      Alert.alert('Erro', error.response?.data?.erro || 'Erro ao salvar transação');
-    } finally {
-      setLoading(false);
+      await api.post('/saida', dados);
+      Alert.alert('Sucesso', 'Saída cadastrada com sucesso!');
+    } else {
+      await api.post('/entrada', dados);
+      Alert.alert('Sucesso', 'Entrada cadastrada com sucesso!');
     }
-  };
+
+    handleCloseModal();
+    carregarTransacoes();
+  } catch (error) {
+    console.error('Erro ao salvar:', error);
+    Alert.alert('Erro', error.response?.data?.erro || 'Erro ao salvar transação');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDeletar = async (id, tipo) => {
     Alert.alert(
@@ -176,7 +187,6 @@ export default function TelaFinancas() {
         Aqui você pode controlar suas finanças de forma simples e eficiente.
       </Text>
 
-      {/* 📊 Listagem de transações direto na tela */}
       <ScrollView style={{ flex: 1, marginBottom: 90 }}>
         <Text style={styles.secaoTitulo}>Entradas</Text>
         {entradas.length > 0 ? (
@@ -256,79 +266,116 @@ export default function TelaFinancas() {
       </Modal>
 
       {/* MODAL: Cadastro Entrada/Saída */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={handleCloseModal}
+<Modal
+  animationType="slide"
+  transparent={true}
+  visible={modalVisible}
+  onRequestClose={handleCloseModal}
+>
+  <Pressable style={styles.modalOverlay} >
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={[styles.modalContent, { maxHeight: '100%' }]}
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
       >
-        <Pressable style={styles.modalOverlay} onPress={handleCloseModal}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.modalContent}
-          >
-            <Text style={styles.modalTitle}>
-              {tipoTransacao === 'entrada' ? 'Nova Entrada' : 'Nova Saída'}
-            </Text>
+        <Text style={styles.modalTitle}>
+          {tipoTransacao === 'entrada' ? 'Nova Entrada' : 'Nova Saída'}
+        </Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Descrição"
-              placeholderTextColor="#999"
-              value={descricao}
-              onChangeText={setDescricao}
-            />
+        <TextInput
+          style={styles.input}
+          placeholder="Descrição"
+          placeholderTextColor="#999"
+          value={descricao}
+          onChangeText={setDescricao}
+        />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Valor (ex: 100.00)"
-              placeholderTextColor="#999"
-              keyboardType="decimal-pad"
-              value={valor}
-              onChangeText={setValor}
-            />
+        <TextInput
+          style={styles.input}
+          placeholder="Valor (ex: 100.00)"
+          placeholderTextColor="#999"
+          keyboardType="decimal-pad"
+          value={valor}
+          onChangeText={setValor}
+        />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Categoria (opcional)"
-              placeholderTextColor="#999"
-              value={categoria}
-              onChangeText={setCategoria}
-            />
+        <TextInput
+          style={styles.input}
+          placeholder="Categoria (opcional)"
+          placeholderTextColor="#999"
+          value={categoria}
+          onChangeText={setCategoria}
+        />
 
-            {tipoTransacao === 'saida' && (
-              <TouchableOpacity
-                style={styles.checkboxContainer}
-                onPress={() => setEhRecorrente(!ehRecorrente)}
-              >
-                <View
-                  style={[styles.checkbox, ehRecorrente && styles.checkboxMarcado]}
-                />
-                <Text style={styles.checkboxTexto}>É uma despesa recorrente?</Text>
-              </TouchableOpacity>
+        {/* Checkbox e DatePicker */}
+        {tipoTransacao === 'saida' && (
+          <>
+            <TouchableOpacity
+              style={styles.checkboxContainer}
+              onPress={() => setEhRecorrente(!ehRecorrente)}
+            >
+              <View
+                style={[styles.checkbox, ehRecorrente && styles.checkboxMarcado]}
+              />
+              <Text style={styles.checkboxTexto}>É uma despesa recorrente?</Text>
+            </TouchableOpacity>
+
+            {ehRecorrente && (
+              <View style={{ width: '100%', alignItems: 'center', marginTop: 10 }}>
+                <TouchableOpacity
+                  style={[styles.input, { justifyContent: 'center' }]}
+                  onPress={() => setMostrarDatePicker(true)}
+                >
+                  <Text style={{ color: '#fff' }}>
+                    📅 {dataRecorrencia.toLocaleDateString('pt-BR')}
+                  </Text>
+                </TouchableOpacity>
+
+                {mostrarDatePicker && (
+                  <View style={{ width: '100%' }}>
+                    <DateTimePicker
+                      value={dataRecorrencia}
+                      mode="date"
+                      display="default"
+                      minimumDate={new Date()} // 🔒 impede datas passadas
+                      onChange={(event, selectedDate) => {
+                        setMostrarDatePicker(false);
+                        if (selectedDate) setDataRecorrencia(selectedDate);
+                      }}
+                    />
+                  </View>
+                )}
+              </View>
             )}
+          </>
+        )}
 
-            <TouchableOpacity
-              style={[styles.modalButton, loading && { opacity: 0.5 }]}
-              onPress={handleSalvar}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.modalButtonText}>Salvar</Text>
-              )}
-            </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.modalButton, loading && { opacity: 0.5 }]}
+          onPress={handleSalvar}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.modalButtonText}>Salvar</Text>
+          )}
+        </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.modalButtonCancelar}
-              onPress={handleCloseModal}
-            >
-              <Text style={styles.modalButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-          </KeyboardAvoidingView>
-        </Pressable>
-      </Modal>
+        <TouchableOpacity
+          style={styles.modalButtonCancelar}
+          onPress={handleCloseModal}
+        >
+          <Text style={styles.modalButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  </Pressable>
+</Modal>
+
     </View>
   );
 }

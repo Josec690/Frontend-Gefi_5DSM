@@ -192,7 +192,7 @@ export default StyleSheet.create({
   bottom: 150, // distância da parte inferior da tela
   alignSelf: 'center', 
   width: 261,
-  height: 40,
+  height: 60,
   backgroundColor: 'rgba(8, 156, 8, 0.6)',
   borderWidth: 1,
   borderColor: 'rgba(129, 199, 132, 0.4)',

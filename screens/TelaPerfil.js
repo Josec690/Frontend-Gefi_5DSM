@@ -18,6 +18,8 @@ import iconeSaidaGota from '../assets/Gota.png';
 import iconeSaidaRaio from '../assets/Raio.png';
 
 export default function PerfilScreen() {
+  const navigation = useNavigation(); // 👈 Hook para navegar entre telas
+
   const [usuario, setUsuario] = useState(null);
   const [balanco, setBalanco] = useState(0);
   const [proximasSaidas, setProximasSaidas] = useState([]);
@@ -96,7 +98,7 @@ export default function PerfilScreen() {
 
       {/* CARD DO BALANÇO */}
       <View style={styles.balancoCard}>
-        <Text style={styles.balancoCardTitle}>Balanço Mensal</Text>
+        <Text style={styles.balancoCardTitle}>Previsão de saldo</Text>
         <Text style={styles.balancoValorText}>
           R$ {balanco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </Text>
@@ -107,6 +109,33 @@ export default function PerfilScreen() {
         <Text style={styles.proximasSaidasTitle}>Próximas Saídas</Text>
       </View>
 
+      <TouchableOpacity 
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate('TelaFinancas')} // 👈 leva pra tela desejada
+      >
+        <View style={styles.proximasSaidasCard}>
+          <View style={styles.horizontalCardsContainer}>
+            {proximasSaidas.length > 0 ? (
+              proximasSaidas.map((saida, index) => (
+                <View key={saida.id} style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}>
+                  <Image 
+                    source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
+                    style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
+                  />
+                  <Text style={styles.ProximaSaidaValor}>
+                    R$ {saida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </Text>
+                  <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
+                </View>
+              ))
+            ) : (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: '#fff', textAlign: 'center' }}>
+                  Nenhuma saída recorrente cadastrada
+                </Text>
+              </View>
+            )}
+          </View>
       {/* CARDS PRÓXIMAS SAÍDAS */}
       <View style={styles.proximasSaidasCard}>
         <View style={styles.horizontalCardsContainer}>
@@ -135,7 +164,7 @@ export default function PerfilScreen() {
             </View>
           )}
         </View>
-      </View>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
