@@ -4,11 +4,15 @@ import { Platform } from 'react-native';
 
 // URL do backend baseada na plataforma
 const getBaseURL = () => {
-    return 'http://<IP_DA_MAQUINA>:5000/api'; // Colocar o IP da maquina Atual - Androidcmd
-
-    
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:5000/api'; // Android Emulator
+  } else if (Platform.OS === 'ios') {
+    return 'http://localhost:5000/api'; // iOS Simulator
+  } else {
+    return 'http://192.168.1.100:5000/api'; // Web
+  }
 };
-//
+
 const api = axios.create({
   baseURL: getBaseURL(),
   headers: {

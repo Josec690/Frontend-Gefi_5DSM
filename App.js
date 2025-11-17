@@ -9,8 +9,9 @@ import TelaCadastro from './screens/TelaCadastro';
 import TelaLogin from './screens/TelaLogin';
 import Usuario from './screens/TelaUsuario';
 import TelaPerguntas from './screens/TelaPerguntas';
-import TelaFinancas from './screens/TelaFinancas'; // ✅ Import da tela de finanças
-import TelaPerfil from './screens/TelaPerfil'; // ✅ Import da tela de perfil
+import TelaFinancas from './screens/TelaFinancas'; 
+import TelaPerfil from './screens/TelaPerfil'; 
+import TelaInvestimento from './screens/TelaInvestimento'; 
 import styles from './styles/EstiloApp';
 import TelaPerfilUser from './screens/TelaPerfilUser';
 import TelaConfig from './screens/TelaConfig';
@@ -64,6 +65,7 @@ export default function App() {
           <Stack.Screen name="Login" component={TelaLogin} />
           <Stack.Screen name="Usuario" component={Usuario} />
           <Stack.Screen name="TelaFinancas" component={TelaFinancas}/>
+          <Stack.Screen name="Investimentos" component={TelaInvestimento} />
           <Stack.Screen name="PerfilUser" component={TelaPerfilUser} />
           <Stack.Screen name="Config" component={TelaConfig} />
           <Stack.Screen name="AlterarSenha" component={TelaAlterarSenha} />
