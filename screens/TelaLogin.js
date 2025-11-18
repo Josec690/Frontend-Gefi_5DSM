@@ -95,12 +95,7 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleForgotPassword = () => {
-    // Aqui você pode navegar para uma tela de recuperação
-    // Exemplo: navigation.navigate('RecuperarSenha');
-    Alert.alert(
-      'Recuperar senha',
-      'Função em desenvolvimento.\nEm breve você poderá redefinir sua senha.'
-    );
+    navigation.navigate('RecuperarSenha');
   };
 
   return (

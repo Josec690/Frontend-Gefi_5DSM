@@ -16,6 +16,7 @@ import styles from './styles/EstiloApp';
 import TelaPerfilUser from './screens/TelaPerfilUser';
 import TelaConfig from './screens/TelaConfig';
 import TelaAlterarSenha from './screens/TelaAlterarSenha';
+import TelaRecuperarSenha from './screens/TelaRecuperarSenha';
 
 
 const Stack = createNativeStackNavigator();
@@ -63,6 +64,7 @@ export default function App() {
           <Stack.Screen name="Cadastro" component={TelaCadastro} />
           <Stack.Screen name="TelaPerguntas" component={TelaPerguntas} />
           <Stack.Screen name="Login" component={TelaLogin} />
+          <Stack.Screen name="RecuperarSenha" component={TelaRecuperarSenha} />
           <Stack.Screen name="Usuario" component={Usuario} />
           <Stack.Screen name="TelaFinancas" component={TelaFinancas}/>
           <Stack.Screen name="Investimentos" component={TelaInvestimento} />

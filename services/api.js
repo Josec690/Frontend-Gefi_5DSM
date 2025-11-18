@@ -1,16 +1,20 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-// URL do backend baseada na plataforma
+// URL do backend baseada no ambiente (Expo, emulador, dispositivo físico, web)
 const getBaseURL = () => {
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:5000/api'; // Android Emulator
-  } else if (Platform.OS === 'ios') {
-    return 'http://localhost:5000/api'; // iOS Simulator
-  } else {
-    return 'http://192.168.1.100:5000/api'; // Web
-  }
+  const envUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (envUrl) return envUrl;
+
+  const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')?.[0]
+    || Constants.manifest?.debuggerHost?.split(':')?.[0];
+  if (hostFromExpo) return `http://${hostFromExpo}:5000/api`;
+
+  if (Platform.OS === 'android') return 'http://10.0.2.2:5000/api';
+  // iOS Simulator / Web fallback
+  return 'http://localhost:5000/api';
 };
 
 const api = axios.create({

@@ -55,7 +55,9 @@ export default function TelaPerfilUser() {
 
       {/* Container dos botões */}
       <View style={styles.containerBotoes}>
-        <TouchableOpacity style={styles.botao}>
+        <TouchableOpacity 
+          style={styles.botao}
+          onPress={() => navigation.navigate('TelaFinancas')}>
           <Text style={styles.textoBotao}>Minhas Atividades</Text>
         </TouchableOpacity>
 
