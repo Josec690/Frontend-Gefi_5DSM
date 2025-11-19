@@ -223,6 +223,7 @@ export function makeStyles(colors) {
       backgroundColor: colors.background,
       paddingHorizontal: 15,
       paddingTop: 40,
+      paddingBottom: 120,
     },
     header: {
       backgroundColor: 'rgba(8, 156, 8, 0.08)',

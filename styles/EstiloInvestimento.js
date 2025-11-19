@@ -128,9 +128,9 @@ export function makeStyles(colors) {
     container: {
       flex: 1,
       backgroundColor: colors.background,
-      padding: 20,
+      padding: 15,
       paddingBottom: 100,
-      paddingTop: 40,
+      paddingTop: 61,
     },
     titleContainer: {
       backgroundColor: 'rgba(8,156,8, 0.08)',
