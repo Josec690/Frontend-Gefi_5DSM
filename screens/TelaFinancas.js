@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,10 +17,13 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import api from '../services/api';
-import styles from '../styles/EstiloFinancas';
+import stylesDefault, { makeStyles } from '../styles/EstiloFinancas';
+import { useAppTheme } from '../context/ThemeContext';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export default function TelaFinancas() {
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [tipoTransacao, setTipoTransacao] = useState('');
@@ -194,7 +197,7 @@ export default function TelaFinancas() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#2ecc71" />
+      <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
       <View style={styles.header}>
         <Text style={styles.headerText}>Controle Financeiro</Text>
       </View>
@@ -355,7 +358,7 @@ export default function TelaFinancas() {
                   style={[styles.input, { justifyContent: 'center' }]}
                   onPress={() => setMostrarDatePicker(true)}
                 >
-                  <Text style={{ color: '#fff' }}>
+                  <Text style={{ color: colors.text }}>
                     📅 {dataRecorrencia.toLocaleDateString('pt-BR')}
                   </Text>
                 </TouchableOpacity>

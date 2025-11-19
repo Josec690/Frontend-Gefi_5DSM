@@ -123,4 +123,110 @@ const styles = StyleSheet.create({
   },
 });
 
+export function makeStyles(colors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 20,
+      paddingBottom: 100,
+      paddingTop: 40,
+    },
+    titleContainer: {
+      backgroundColor: 'rgba(8,156,8, 0.08)',
+      padding: 15,
+      borderRadius: 12,
+      marginTop: 20,
+      marginBottom: 20,
+      alignItems: 'center',
+      borderWidth: colors.background === '#F7F9FC' ? 2 : 1,
+      borderColor: colors.border,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color: colors.text,
+    },
+    section: {
+      marginBottom: 30,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    investItem: {
+      backgroundColor: colors.card,
+      padding: 15,
+      borderRadius: 12,
+      borderWidth: colors.background === '#F7F9FC' ? 2 : 1,
+      borderColor: colors.border,
+      marginBottom: 12,
+    },
+    investHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 5,
+    },
+    investName: {
+      fontSize: 16,
+      color: colors.text,
+      fontWeight: 'bold',
+      flex: 1,
+    },
+    investType: {
+      fontSize: 13,
+      color: colors.mutedText,
+      marginTop: 2,
+    },
+    investYield: {
+      fontSize: 14,
+      color: colors.mutedText,
+      marginTop: 4,
+    },
+    investRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 5,
+    },
+    investRisk: {
+      fontSize: 13,
+      color: colors.mutedText,
+    },
+    investLiquidity: {
+      fontSize: 13,
+      color: colors.mutedText,
+    },
+    investPrice: {
+      fontSize: 16,
+      color: '#57FF5A',
+      fontWeight: 'bold',
+    },
+    investVariation: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      marginTop: 6,
+    },
+    investSubtext: {
+      fontSize: 12,
+      color: colors.mutedText,
+      marginTop: 2,
+    },
+    investUnavailable: {
+      fontSize: 12,
+      color: '#FFA500',
+      fontStyle: 'italic',
+    },
+    investSource: {
+      fontSize: 10,
+      color: colors.mutedText,
+      marginTop: 4,
+      fontStyle: 'italic',
+    },
+    separator: { height: 12 },
+  });
+}
+
 export default styles;

@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, Image, TouchableOpacity, StatusBar } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import styles from '../styles/EstiloPerfilUser';
+import stylesDefault, { makeStyles } from '../styles/EstiloPerfilUser';
 import perfilIcon from '../assets/Perfil.png';
 import seta from '../assets/seta.png';
 import api from '../services/api'; // API para pegar dados do usuário
+import { useAppTheme } from '../context/ThemeContext';
 
 export default function TelaPerfilUser() {
   const navigation = useNavigation();
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [usuario, setUsuario] = useState({ nome: '', email: '' });
   const [loading, setLoading] = useState(true);
 
@@ -32,14 +35,14 @@ export default function TelaPerfilUser() {
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: '#fff' }}>Carregando...</Text>
+        <Text style={{ color: colors.text }}>Carregando...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
       {/* Seta de voltar */}
       <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
@@ -57,7 +60,7 @@ export default function TelaPerfilUser() {
       <View style={styles.containerBotoes}>
         <TouchableOpacity 
           style={styles.botao}
-          onPress={() => navigation.navigate('TelaFinancas')}>
+          onPress={() => navigation.navigate('Usuario', { screen: 'Financas' })}>
           <Text style={styles.textoBotao}>Minhas Atividades</Text>
         </TouchableOpacity>
 
