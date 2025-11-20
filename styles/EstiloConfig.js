@@ -41,12 +41,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 3,
     top: 75,
-    width: 30,
-    height: 30,
-  },
-  iconeEditar: {
-    width: 30,
-    height: 30,
+    width: 36,
+    height: 32,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(129, 199, 132, 0.3)',
   },
 });
 
@@ -92,13 +94,14 @@ export function makeStyles(colors) {
       position: 'absolute',
       right: 3,
       top: 75,
-      width: 30,
-      height: 30,
-    },
-    iconeEditar: {
-      width: 30,
-      height: 30,
-      tintColor: colors.text,
+      width: 36,
+      height: 32,
+      borderRadius: 6,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.card,
+      borderWidth: colors.background === '#F7F9FC' ? 2 : 1,
+      borderColor: colors.border,
     },
   });
 }

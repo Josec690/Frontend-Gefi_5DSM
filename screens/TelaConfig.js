@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, StatusBar } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import stylesDefault, { makeStyles } from '../styles/EstiloConfig';
 import api from '../services/api';
-import iconeEditar from '../assets/edit.png'; // lápis
 import seta from '../assets/seta.png'; // seta de voltar
 import { useAppTheme } from '../context/ThemeContext';
 
@@ -74,8 +74,9 @@ export default function TelaConfig() {
         <TouchableOpacity
           style={styles.botaoEditarSenha}
           onPress={() => navigation.navigate('AlterarSenha')}
+          accessibilityLabel="Editar senha"
         >
-          <Image source={iconeEditar} style={styles.iconeEditar} />
+          <FontAwesome name="pencil" size={16} color={colors.text} />
         </TouchableOpacity>
       </View>
 
