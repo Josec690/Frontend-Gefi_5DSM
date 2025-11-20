@@ -79,4 +79,86 @@ const styles = StyleSheet.create({
   },
 });
 
+export function makeStyles(colors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      width: '100%',
+      backgroundColor: colors.background,
+      padding: 20,
+      justifyContent: 'center',
+    },
+    title: {
+      fontSize: 30,
+      color: colors.text,
+      textAlign: 'left',
+      marginBottom: 30,
+      marginLeft: 20,
+      fontWeight: 'bold',
+      alignSelf: 'center',
+    },
+    text: {
+      fontSize: 18,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 25,
+      alignSelf: 'center',
+      width: 250,
+    },
+    input: {
+      width: 350,
+      alignSelf: 'center',
+      backgroundColor: colors.inputBg,
+      color: colors.inputText,
+      borderRadius: 5,
+      padding: 10,
+      marginBottom: 15,
+      fontSize: 16,
+      borderColor: colors.border,
+      borderWidth: colors.background === '#F7F9FC' ? 2 : 1,
+    },
+    button: {
+      width: 260,
+      backgroundColor: 'rgba(8, 156, 1, 0.2)',
+      padding: 15,
+      borderRadius: 12,
+      alignItems: 'center',
+      alignSelf: 'center',
+      marginTop: 10,
+      borderBottomRightRadius: 20,
+      borderBottomLeftRadius: 0,
+      borderTopRightRadius: 0,
+      borderTopLeftRadius: 20,
+      borderColor: colors.border,
+      borderWidth: colors.background === '#F7F9FC' ? 2 : 1,
+    },
+    buttonText: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginTop: 0,
+    },
+    image: {
+      width: 300,
+      height: 250,
+      marginBottom: 20,
+      alignSelf: 'center',
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      marginBottom: 25,
+      gap: 10,
+    },
+    errorText: {
+      color: 'rgba(255, 138, 138, 0.5)',
+      marginTop: -22,
+      marginBottom: 5,
+      marginLeft: 14,
+      fontSize: 12,
+    },
+  });
+}
+
 export default styles;

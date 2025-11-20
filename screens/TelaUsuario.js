@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -6,11 +6,14 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import PerfilScreen from './TelaPerfil';
 import InvestScreen from './TelaInvestimento';
 import FinancasScreen from './TelaFinancas';
-import styles from '../styles/EstiloPerfil';
+import stylesDefault, { makeStyles } from '../styles/EstiloPerfil';
+import { useAppTheme } from '../context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 
 export default function UsuarioTabs() {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

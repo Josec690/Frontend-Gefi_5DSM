@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,11 +16,15 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import api from '../services/api';
-import styles from '../styles/EstiloFinancas';
+import stylesDefault, { makeStyles } from '../styles/EstiloFinancas';
+import { useAppTheme } from '../context/ThemeContext';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export default function TelaFinancas() {
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [tipoTransacao, setTipoTransacao] = useState('');
@@ -36,6 +40,10 @@ export default function TelaFinancas() {
   const [ehRecorrente, setEhRecorrente] = useState(false);
   const [dataRecorrencia, setDataRecorrencia] = useState(new Date());
   const [mostrarDatePicker, setMostrarDatePicker] = useState(false);
+
+  // Estados para edição
+  const [modoEdicao, setModoEdicao] = useState(false);
+  const [transacaoEditando, setTransacaoEditando] = useState(null);
 
   // Listas
   const [entradas, setEntradas] = useState([]);
@@ -76,6 +84,8 @@ export default function TelaFinancas() {
   const handleAbrirModal = (tipo) => {
     setTipoTransacao(tipo);
     setModalVisible(true);
+    setModoEdicao(false);
+    setTransacaoEditando(null);
     setDescricao('');
     setValor('');
     setCategoria('');
@@ -83,9 +93,25 @@ export default function TelaFinancas() {
     setDataRecorrencia(new Date());
   };
 
+  const handleEditarTransacao = (item, tipo) => {
+    setTipoTransacao(tipo);
+    setModoEdicao(true);
+    setTransacaoEditando(item);
+    setDescricao(item.descricao);
+    setValor(String(item.valor));
+    setCategoria(item.categoria);
+    setEhRecorrente(item.eh_recorrente || false);
+    if (item.data_primeira_recorrencia) {
+      setDataRecorrencia(new Date(item.data_primeira_recorrencia));
+    }
+    setModalVisible(true);
+  };
+
   const handleCloseModal = () => {
     setModalVisible(false);
     setTipoTransacao('');
+    setModoEdicao(false);
+    setTransacaoEditando(null);
   };
 
  const handleSalvar = async () => {
@@ -116,14 +142,26 @@ export default function TelaFinancas() {
       if (ehRecorrente) {
         const dataISO = dataRecorrencia.toISOString();
         dados.data_primeira_recorrencia = dataISO;
-        dados.data = dataISO; 
+        if (!modoEdicao) {
+          dados.data = dataISO; 
+        }
       }
 
-      await api.post('/saida', dados);
-      Alert.alert('Sucesso', 'Saída cadastrada com sucesso!');
+      if (modoEdicao) {
+        await api.put(`/saida/${transacaoEditando.id}`, dados);
+        Alert.alert('Sucesso', 'Saída atualizada com sucesso!');
+      } else {
+        await api.post('/saida', dados);
+        Alert.alert('Sucesso', 'Saída cadastrada com sucesso!');
+      }
     } else {
-      await api.post('/entrada', dados);
-      Alert.alert('Sucesso', 'Entrada cadastrada com sucesso!');
+      if (modoEdicao) {
+        await api.put(`/entrada/${transacaoEditando.id}`, dados);
+        Alert.alert('Sucesso', 'Entrada atualizada com sucesso!');
+      } else {
+        await api.post('/entrada', dados);
+        Alert.alert('Sucesso', 'Entrada cadastrada com sucesso!');
+      }
     }
 
     handleCloseModal();
@@ -182,19 +220,29 @@ export default function TelaFinancas() {
         >
           {tipo === 'entrada' ? '+' : '-'} R$ {item.valor.toFixed(2)}
         </Text>
-        <TouchableOpacity
-          onPress={() => handleDeletar(item.id, tipo)}
-          style={styles.botaoDeletar}
-        >
-          <Text style={styles.textoDeletar}>Deletar</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 5 }}>
+          <TouchableOpacity
+            onPress={() => handleEditarTransacao(item, tipo)}
+            style={styles.botaoEditar}
+            accessibilityLabel="Editar transação"
+          >
+            <FontAwesome name="pencil" size={16} color={colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleDeletar(item.id, tipo)}
+            style={styles.botaoDeletar}
+            accessibilityLabel="Deletar transação"
+          >
+            <FontAwesome name="trash" size={16} color={colors.text} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#2ecc71" />
+      <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
       <View style={styles.header}>
         <Text style={styles.headerText}>Controle Financeiro</Text>
       </View>
@@ -355,7 +403,7 @@ export default function TelaFinancas() {
                   style={[styles.input, { justifyContent: 'center' }]}
                   onPress={() => setMostrarDatePicker(true)}
                 >
-                  <Text style={{ color: '#fff' }}>
+                  <Text style={{ color: colors.text }}>
                     📅 {dataRecorrencia.toLocaleDateString('pt-BR')}
                   </Text>
                 </TouchableOpacity>

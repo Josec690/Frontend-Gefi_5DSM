@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, StatusBar } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import styles from '../styles/EstiloConfig';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import stylesDefault, { makeStyles } from '../styles/EstiloConfig';
 import api from '../services/api';
-import iconeEditar from '../assets/edit.png'; // lápis
 import seta from '../assets/seta.png'; // seta de voltar
+import { useAppTheme } from '../context/ThemeContext';
 
 export default function TelaConfig() {
   const navigation = useNavigation();
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [usuario, setUsuario] = useState({ nome: '', email: '', cpf: '', senha: '' });
   const [loading, setLoading] = useState(true);
 
@@ -71,10 +74,13 @@ export default function TelaConfig() {
         <TouchableOpacity
           style={styles.botaoEditarSenha}
           onPress={() => navigation.navigate('AlterarSenha')}
+          accessibilityLabel="Editar senha"
         >
-          <Image source={iconeEditar} style={styles.iconeEditar} />
+          <FontAwesome name="pencil" size={16} color={colors.text} />
         </TouchableOpacity>
       </View>
+
+      {/* Controle de tema removido conforme solicitado */}
     </View>
   );
 }

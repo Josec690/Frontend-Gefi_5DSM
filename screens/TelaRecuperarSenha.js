@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,12 +14,15 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import styles from '../styles/EstiloLogin';
+import stylesDefault, { makeStyles } from '../styles/EstiloLogin';
 import Grafico from '../assets/Grafico2.png';
 import seta from '../assets/seta.png';
 import api from '../services/api';
+import { useAppTheme } from '../context/ThemeContext';
 
 export default function TelaRecuperarSenha({ navigation }) {
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [email, setEmail] = useState('');
   const [codigo, setCodigo] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
@@ -113,7 +116,7 @@ export default function TelaRecuperarSenha({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#000' }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -125,18 +128,18 @@ export default function TelaRecuperarSenha({ navigation }) {
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20,
-            backgroundColor: '#000',
+            backgroundColor: colors.background,
           }}
           showsVerticalScrollIndicator={false}
         >
-          <StatusBar barStyle="light-content" backgroundColor="#000" />
+          <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
           {/* Botão voltar */}
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={{ position: 'absolute', top: 40, left: 20 }}
           >
-            <Image source={seta} style={{ width: 30, height: 30, tintColor: '#fff' }} />
+            <Image source={seta} style={{ width: 30, height: 30, tintColor: colors.text }} />
           </TouchableOpacity>
 
           <View style={styles.header}>
@@ -158,7 +161,7 @@ export default function TelaRecuperarSenha({ navigation }) {
                 <TextInput
                   style={styles.inputEmail}
                   placeholder=" E-mail"
-                  placeholderTextColor="#ccc"
+                  placeholderTextColor={colors.mutedText}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -186,7 +189,7 @@ export default function TelaRecuperarSenha({ navigation }) {
                 <TextInput
                   style={styles.inputEmail}
                   placeholder=" Código de 6 dígitos"
-                  placeholderTextColor="#ccc"
+                  placeholderTextColor={colors.mutedText}
                   value={codigo}
                   onChangeText={setCodigo}
                   keyboardType="number-pad"
@@ -199,7 +202,7 @@ export default function TelaRecuperarSenha({ navigation }) {
                 <TextInput
                   style={styles.inputSenha}
                   placeholder=" Nova Senha"
-                  placeholderTextColor="#ccc"
+                  placeholderTextColor={colors.mutedText}
                   value={novaSenha}
                   onChangeText={setNovaSenha}
                   secureTextEntry
@@ -211,7 +214,7 @@ export default function TelaRecuperarSenha({ navigation }) {
                 <TextInput
                   style={styles.inputSenha}
                   placeholder=" Confirmar Nova Senha"
-                  placeholderTextColor="#ccc"
+                  placeholderTextColor={colors.mutedText}
                   value={confirmarSenha}
                   onChangeText={setConfirmarSenha}
                   secureTextEntry
@@ -232,7 +235,7 @@ export default function TelaRecuperarSenha({ navigation }) {
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => setEtapa(1)} style={{ marginTop: 15 }}>
-                <Text style={{ color: '#00BFFF', fontSize: 14 }}>
+                <Text style={styles.linkText}>
                   Não recebeu o código? Reenviar
                 </Text>
               </TouchableOpacity>
