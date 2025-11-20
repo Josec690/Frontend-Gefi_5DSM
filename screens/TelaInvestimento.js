@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, FlatList, ActivityIndicator, ScrollView, RefreshControl, SafeAreaView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../services/api';
-import styles from '../styles/EstiloInvestimento';
+import stylesDefault, { makeStyles } from '../styles/EstiloInvestimento';
+import { useAppTheme } from '../context/ThemeContext';
 
 
 export default function InvestScreen() {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [investimentos, setInvestimentos] = useState([]);
   const [emAlta, setEmAlta] = useState([]);
   const [tesouro, setTesouro] = useState([]);
@@ -46,7 +49,7 @@ export default function InvestScreen() {
     return (
       <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#57FF5A" />
-        <Text style={{ color: '#fff', marginTop: 10 }}>Carregando investimentos...</Text>
+        <Text style={{ color: colors.text, marginTop: 10 }}>Carregando investimentos...</Text>
       </SafeAreaView>
     );
   }

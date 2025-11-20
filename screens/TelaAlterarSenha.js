@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StatusBar, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import styles from '../styles/EstiloAlterarSenha';
+import stylesDefault, { makeStyles } from '../styles/EstiloAlterarSenha';
 import seta from '../assets/seta.png';
 import api from '../services/api';
+import { useAppTheme } from '../context/ThemeContext';
 
 export default function TelaAlterarSenha() {
   const navigation = useNavigation();
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [senhaAtual, setSenhaAtual] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmaSenha, setConfirmaSenha] = useState('');
@@ -44,7 +47,7 @@ export default function TelaAlterarSenha() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
       {/* Seta de voltar */}
       <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>

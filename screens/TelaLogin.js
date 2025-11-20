@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import styles from '../styles/EstiloLogin';
+import stylesDefault, { makeStyles } from '../styles/EstiloLogin';
+import { useAppTheme } from '../context/ThemeContext';
 import Grafico from '../assets/Grafico2.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api'; // Importa o serviço
@@ -24,6 +25,8 @@ import api from '../services/api'; // Importa o serviço
 const { height } = Dimensions.get('window');
 
 export default function LoginScreen({ navigation }) {
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,9 +37,9 @@ export default function LoginScreen({ navigation }) {
   const senhaRef = useRef(null);
 
   useEffect(() => {
-    StatusBar.setBackgroundColor('#000');
-    StatusBar.setBarStyle('light-content');
-  }, []);
+    StatusBar.setBackgroundColor('transparent');
+    StatusBar.setBarStyle(themeName === 'dark' ? 'light-content' : 'dark-content');
+  }, [themeName]);
 
   // leve animação opcional (só pra dar "suavidade")
   useEffect(() => {
@@ -100,7 +103,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#000' }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 20}
     >
@@ -115,7 +118,7 @@ export default function LoginScreen({ navigation }) {
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20,
-            backgroundColor: '#000',
+            backgroundColor: colors.background,
           }}
           showsVerticalScrollIndicator={false}
           resetScrollToCoords={{ x: 0, y: 0 }} // garante voltar ao topo/centro quando teclado fecha
@@ -127,7 +130,7 @@ export default function LoginScreen({ navigation }) {
               transform: [{ translateY }],
             }}
           >
-            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
             <View style={styles.header}>
               <TouchableOpacity onPress={() => navigation.navigate('Cadastro')} accessibilityRole="button">
@@ -143,7 +146,7 @@ export default function LoginScreen({ navigation }) {
               <TextInput
                 style={styles.inputEmail}
                 placeholder=" E-mail"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.mutedText}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -162,7 +165,7 @@ export default function LoginScreen({ navigation }) {
                 ref={senhaRef}
                 style={styles.inputSenha}
                 placeholder=" Senha"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.mutedText}
                 value={senha}
                 onChangeText={setSenha}
                 secureTextEntry
@@ -174,7 +177,7 @@ export default function LoginScreen({ navigation }) {
 
       {/* 🔗 Link de esqueci minha senha */}
       <TouchableOpacity onPress={handleForgotPassword} style={{ alignSelf: 'flex-end', marginBottom: 20 }}>
-        <Text style={{ color: '#00BFFF', fontSize: 14 }}>Esqueci minha senha?</Text>
+        <Text style={styles.forgotLink}>Esqueci minha senha?</Text>
       </TouchableOpacity>
 
             <TouchableOpacity
