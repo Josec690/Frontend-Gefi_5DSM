@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import styles from '../styles/EstiloCadastro';
+import stylesDefault, { makeStyles } from '../styles/EstiloCadastro';
+import { useAppTheme } from '../context/ThemeContext';
 import Grafico from '../assets/Grafico.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
@@ -24,6 +25,8 @@ import api from '../services/api';
 const { height } = Dimensions.get('window');
 
 export default function TelaCadastro({ navigation }) {
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [cpf, setCpf] = useState('');
@@ -42,9 +45,9 @@ export default function TelaCadastro({ navigation }) {
   const translateY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    StatusBar.setBackgroundColor('#000');
-    StatusBar.setBarStyle('light-content');
-  }, []);
+    StatusBar.setBackgroundColor('transparent');
+    StatusBar.setBarStyle(themeName === 'dark' ? 'light-content' : 'dark-content');
+  }, [themeName]);
 
   // animação leve quando o teclado abre
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function TelaCadastro({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#000' }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 20}
     >
@@ -132,7 +135,7 @@ export default function TelaCadastro({ navigation }) {
             justifyContent: 'center',
             alignItems: 'center',
             padding: 20,
-            backgroundColor: '#000',
+            backgroundColor: colors.background,
           }}
           showsVerticalScrollIndicator={false}
         >
@@ -143,7 +146,7 @@ export default function TelaCadastro({ navigation }) {
               transform: [{ translateY }],
             }}
           >
-            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
             <View style={styles.header}>
               <TouchableOpacity onPress={() => navigation.navigate('Intro')} accessibilityRole="button">
@@ -163,7 +166,7 @@ export default function TelaCadastro({ navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder=" Nome"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.mutedText}
                 value={nome}
                 onChangeText={setNome}
                 returnKeyType="next"
@@ -180,7 +183,7 @@ export default function TelaCadastro({ navigation }) {
                 ref={emailRef}
                 style={styles.input}
                 placeholder=" E-mail"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.mutedText}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -200,7 +203,7 @@ export default function TelaCadastro({ navigation }) {
                 ref={cpfRef}
                 style={styles.input}
                 placeholder=" CPF"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.mutedText}
                 value={cpf}
                 onChangeText={setCpf}
                 keyboardType="numeric"
@@ -218,7 +221,7 @@ export default function TelaCadastro({ navigation }) {
                 ref={senhaRef}
                 style={styles.input}
                 placeholder=" Senha"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.mutedText}
                 value={senha}
                 onChangeText={setSenha}
                 secureTextEntry

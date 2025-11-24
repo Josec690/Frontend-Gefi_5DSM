@@ -1,8 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, FlatList, useWindowDimensions, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import api from '../services/api';
-import styles from '../styles/EstiloPerguntas';
+import stylesDefault, { makeStyles } from '../styles/EstiloPerguntas';
+import { useAppTheme } from '../context/ThemeContext';
 
 const questions = [
   {
@@ -23,6 +24,8 @@ const questions = [
 ];
 
 export default function TelaPerguntas({ navigation }) {
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [answers, setAnswers] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -107,7 +110,7 @@ export default function TelaPerguntas({ navigation }) {
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Text style={styles.title}>GeFi</Text>
 
       <FlatList
@@ -140,17 +143,17 @@ export default function TelaPerguntas({ navigation }) {
       {loading && (
         <View style={{ position: 'absolute', bottom: 100, alignSelf: 'center' }}>
           <ActivityIndicator size="large" color="#57FF5A" />
-          <Text style={{ color: '#fff', marginTop: 10 }}>Salvando...</Text>
+          <Text style={{ color: colors.text, marginTop: 10 }}>Salvando...</Text>
         </View>
       )}
 
       {showWelcome && (
         <View style={StyleSheet.absoluteFill}>
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }]}>
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
             <Animatable.Text
               animation="fadeInDown"
               duration={1000}
-              style={{ fontSize: 32, fontWeight: 'bold', color: '#fff' }}
+              style={{ fontSize: 32, fontWeight: 'bold', color: colors.text }}
             >
               Bem-vindo!
             </Animatable.Text>

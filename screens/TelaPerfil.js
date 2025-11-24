@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   View, 
   Text, 
@@ -11,13 +11,16 @@ import {
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import api from '../services/api';
-import styles from '../styles/EstiloPerfil'; 
+import stylesDefault, { makeStyles } from '../styles/EstiloPerfil'; 
+import { useAppTheme } from '../context/ThemeContext';
 
 import perfilIcon from '../assets/Perfil.png';
 import iconeSaidaGota from '../assets/Gota.png'; 
 import iconeSaidaRaio from '../assets/Raio.png';
 
 export default function PerfilScreen() {
+  const { colors, themeName } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const navigation = useNavigation(); // 👈 Hook para navegar entre telas
 
   const [usuario, setUsuario] = useState(null);
@@ -81,7 +84,7 @@ export default function PerfilScreen() {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#57FF5A" />
       }>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
       {/* NAVBAR COM BOTÃO DE PERFIL */}
       <View style={styles.navbar}>
@@ -110,7 +113,7 @@ export default function PerfilScreen() {
 
       <TouchableOpacity 
         activeOpacity={0.8}
-        onPress={() => navigation.navigate('TelaFinancas')} // 👈 leva pra tela desejada
+        onPress={() => navigation.navigate('Financas')}
       >
         
       {/* CARDS PRÓXIMAS SAÍDAS */}
@@ -135,7 +138,7 @@ export default function PerfilScreen() {
               ))
             ) : (
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ color: '#fff', textAlign: 'center' }}>
+                <Text style={{ color: colors.text, textAlign: 'center' }}>
                   Nenhuma saída recorrente cadastrada
                 </Text>
               </View>
