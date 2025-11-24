@@ -6,6 +6,8 @@ import perfilIcon from '../assets/Perfil.png';
 import seta from '../assets/seta.png';
 import api from '../services/api'; // API para pegar dados do usuário
 import { useAppTheme } from '../context/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function TelaPerfilUser() {
   const navigation = useNavigation();
@@ -13,6 +15,19 @@ export default function TelaPerfilUser() {
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [usuario, setUsuario] = useState({ nome: '', email: '' });
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('user');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   // Carregar dados do usuário ao focar na tela
   useFocusEffect(
@@ -58,24 +73,24 @@ export default function TelaPerfilUser() {
 
       {/* Container dos botões */}
       <View style={styles.containerBotoes}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.botao}
           onPress={() => navigation.navigate('Usuario', { screen: 'Financas' })}>
           <Text style={styles.textoBotao}>Minhas Atividades</Text>
         </TouchableOpacity>
 
-     <TouchableOpacity 
-      style={styles.botao} 
-      onPress={() => navigation.navigate('Config')}>
-     <Text style={styles.textoBotao}>Configurações</Text>
-     </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.botao}
+          onPress={() => navigation.navigate('Config')}>
+          <Text style={styles.textoBotao}>Configurações</Text>
+        </TouchableOpacity>
 
 
         <TouchableOpacity style={styles.botao}>
           <Text style={styles.textoBotao}>Ajuda</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.botaoSair} onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity style={styles.botaoSair} onPress={handleLogout}>
           <Text style={styles.textoBotao}>Sair</Text>
         </TouchableOpacity>
       </View>

@@ -306,7 +306,7 @@ export default function TelaFinancas() {
                 handleAbrirModal('entrada');
               }}
             >
-              <Text style={styles.buttonText}>+ Entrada</Text>
+              <Text style={styles.buttonText}>Entrada</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -316,7 +316,7 @@ export default function TelaFinancas() {
                 handleAbrirModal('saida');
               }}
             >
-              <Text style={styles.buttonText}>- Saída</Text>
+              <Text style={styles.buttonText}>Saída</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

@@ -21,6 +21,8 @@ import { useAppTheme } from '../context/ThemeContext';
 import Grafico from '../assets/Grafico.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
+import { Ionicons } from '@expo/vector-icons';
+
 
 const { height } = Dimensions.get('window');
 
@@ -32,6 +34,8 @@ export default function TelaCadastro({ navigation }) {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const [nomeErro, setNomeErro] = useState('');
   const [emailErro, setEmailErro] = useState('');
@@ -214,22 +218,44 @@ export default function TelaCadastro({ navigation }) {
               />
             </View>
 
-            {/* SENHA */}
-            <View style={{ width: '100%', marginBottom: 15 }}>
-              {senhaErro ? <Text style={styles.errorText}>{senhaErro}</Text> : null}
-              <TextInput
-                ref={senhaRef}
-                style={styles.input}
-                placeholder=" Senha"
-                placeholderTextColor={colors.mutedText}
-                value={senha}
-                onChangeText={setSenha}
-                secureTextEntry
-                returnKeyType="done"
-                onSubmitEditing={handleCadastro}
-                editable={!loading}
-              />
-            </View>
+          {/* SENHA */}
+<View style={{ width: '100%', marginBottom: 15 }}>
+  {senhaErro ? <Text style={styles.errorText}>{senhaErro}</Text> : null}
+
+  <View style={{ position: 'relative' }}>
+    <TextInput
+      ref={senhaRef}
+      style={[styles.input, { paddingRight: 45 }]} // espaço para o ícone
+      placeholder=" Senha"
+      placeholderTextColor={colors.mutedText}
+      value={senha}
+      onChangeText={setSenha}
+      secureTextEntry={!showPassword}
+      returnKeyType="done"
+      onSubmitEditing={handleCadastro}
+      editable={!loading}
+    />
+
+    {/* BOTÃO DE MOSTRAR/OCULTAR */}
+    <TouchableOpacity
+      onPress={() => setShowPassword((prev) => !prev)}
+      style={{
+        position: 'absolute',
+        right: 5,
+        top: '30%',
+        transform: [{ translateY: -12 }],
+        padding: 5,
+      }}
+    >
+      <Ionicons
+        name={showPassword ? "eye-off-outline" : "eye-outline"}
+        size={22}
+        color={colors.text}
+      />
+    </TouchableOpacity>
+  </View>
+</View>
+
 
             {/* BOTÃO */}
             <TouchableOpacity

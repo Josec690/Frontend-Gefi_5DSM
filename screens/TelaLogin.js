@@ -20,20 +20,23 @@ import stylesDefault, { makeStyles } from '../styles/EstiloLogin';
 import { useAppTheme } from '../context/ThemeContext';
 import Grafico from '../assets/Grafico2.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../services/api'; // Importa o serviço
+import api from '../services/api';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { height } = Dimensions.get('window');
 
 export default function LoginScreen({ navigation }) {
   const { colors, themeName } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailErro, setEmailErro] = useState('');
   const [senhaErro, setSenhaErro] = useState('');
-  const translateY = useRef(new Animated.Value(0)).current;
+  const [showPassword, setShowPassword] = useState(false);
 
+  const translateY = useRef(new Animated.Value(0)).current;
   const senhaRef = useRef(null);
 
   useEffect(() => {
@@ -41,7 +44,6 @@ export default function LoginScreen({ navigation }) {
     StatusBar.setBarStyle(themeName === 'dark' ? 'light-content' : 'dark-content');
   }, [themeName]);
 
-  // leve animação opcional (só pra dar "suavidade")
   useEffect(() => {
     const show = Keyboard.addListener('keyboardDidShow', (e) => {
       const keyboardHeight = e.endCoordinates?.height || 300;
@@ -59,32 +61,43 @@ export default function LoginScreen({ navigation }) {
         useNativeDriver: true,
       }).start();
     });
+
     return () => {
       show.remove();
       hide.remove();
     };
-  }, [translateY]);
+  }, []);
 
   const handleLogin = async () => {
     setEmailErro('');
     setSenhaErro('');
     let hasError = false;
-    if (!email.trim()) { setEmailErro('Esse campo precisa ser preenchido!'); hasError = true; }
-    if (!senha.trim()) { setSenhaErro('Esse campo precisa ser preenchido!'); hasError = true; }
+
+    if (!email.trim()) {
+      setEmailErro('Esse campo precisa ser preenchido!');
+      hasError = true;
+    }
+    if (!senha.trim()) {
+      setSenhaErro('Esse campo precisa ser preenchido!');
+      hasError = true;
+    }
     if (hasError) return;
 
     setLoading(true);
+
     try {
       const response = await api.post('/login', {
         email: email.trim().toLowerCase(),
         senha,
       });
+
       await AsyncStorage.setItem('token', response.data.token);
       await AsyncStorage.setItem('user', JSON.stringify(response.data.usuario));
+
       Alert.alert('Sucesso!', 'Login realizado com sucesso!');
       navigation.navigate('Usuario');
+
     } catch (error) {
-      console.error('Erro no login:', error);
       if (error.response) {
         Alert.alert('Erro', error.response.data.erro || 'Email ou senha incorretos');
       } else if (error.request) {
@@ -97,10 +110,6 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  const handleForgotPassword = () => {
-    navigation.navigate('RecuperarSenha');
-  };
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: colors.background }}
@@ -110,8 +119,7 @@ export default function LoginScreen({ navigation }) {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAwareScrollView
           enableOnAndroid={true}
-          extraScrollHeight={Platform.OS === 'android' ? 120 : 60} // ajusta quanto rola acima do input
-          keyboardOpeningTime={0}
+          extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
           contentContainerStyle={{
             flexGrow: 1,
             minHeight: height,
@@ -121,19 +129,11 @@ export default function LoginScreen({ navigation }) {
             backgroundColor: colors.background,
           }}
           showsVerticalScrollIndicator={false}
-          resetScrollToCoords={{ x: 0, y: 0 }} // garante voltar ao topo/centro quando teclado fecha
         >
-          <Animated.View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-              transform: [{ translateY }],
-            }}
-          >
-            <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
+          <Animated.View style={{ width: '100%', alignItems: 'center', transform: [{ translateY }] }}>
 
             <View style={styles.header}>
-              <TouchableOpacity onPress={() => navigation.navigate('Cadastro')} accessibilityRole="button">
+              <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
                 <Text style={styles.title}>Gefi</Text>
               </TouchableOpacity>
             </View>
@@ -141,8 +141,10 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.text}>Que bom te ver por aqui!</Text>
             <Image source={Grafico} style={styles.image} />
 
+            {/* EMAIL */}
             <View style={{ width: '100%', marginBottom: 15 }}>
               {emailErro ? <Text style={styles.errorText}>{emailErro}</Text> : null}
+
               <TextInput
                 style={styles.inputEmail}
                 placeholder=" E-mail"
@@ -152,51 +154,69 @@ export default function LoginScreen({ navigation }) {
                 keyboardType="email-address"
                 returnKeyType="next"
                 onSubmitEditing={() => senhaRef.current?.focus()}
-                blurOnSubmit={false}
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!loading}
               />
             </View>
 
+            {/* SENHA */}
             <View style={{ width: '100%', marginBottom: 15 }}>
               {senhaErro ? <Text style={styles.errorText}>{senhaErro}</Text> : null}
-              <TextInput
-                ref={senhaRef}
-                style={styles.inputSenha}
-                placeholder=" Senha"
-                placeholderTextColor={colors.mutedText}
-                value={senha}
-                onChangeText={setSenha}
-                secureTextEntry
-                returnKeyType="done"
-                onSubmitEditing={handleLogin}
-                editable={!loading}
-              />
+
+              <View style={{ position: 'relative' }}>
+                <TextInput
+                  ref={senhaRef}
+                  style={[styles.inputSenha, { paddingRight: 45 }]}
+                  placeholder=" Senha"
+                  placeholderTextColor={colors.mutedText}
+                  value={senha}
+                  onChangeText={setSenha}
+                  secureTextEntry={!showPassword}
+                  returnKeyType="done"
+                  onSubmitEditing={handleLogin}
+                  editable={!loading}
+                />
+
+                {/* Botão para mostrar/ocultar senha */}
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: 5,
+                    top: '25%',
+                    transform: [{ translateY: -12 }],
+                    padding: 5,
+                  }}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-off-outline" : "eye-outline"}
+                    size={25}
+                    color={colors.text}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
 
-      {/* 🔗 Link de esqueci minha senha */}
-      <TouchableOpacity onPress={handleForgotPassword} style={{ alignSelf: 'flex-end', marginBottom: 20 }}>
-        <Text style={styles.forgotLink}>Esqueci minha senha?</Text>
-      </TouchableOpacity>
+            {/* LINK */}
+            <TouchableOpacity onPress={() => navigation.navigate('RecuperarSenha')} style={{ alignSelf: 'flex-end', marginBottom: 20 }}>
+              <Text style={styles.forgotLink}>Esqueci minha senha?</Text>
+            </TouchableOpacity>
 
+            {/* BOTÃO LOGIN */}
             <TouchableOpacity
               style={[styles.button, loading && { opacity: 0.5 }]}
               onPress={handleLogin}
               disabled={loading}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Entrar</Text>
-              )}
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Entrar</Text>}
             </TouchableOpacity>
 
+            {/* LINK DE CADASTRO */}
             <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
-              <Text style={styles.linkText}>
-                Ainda não tem uma conta? Cadastre-se
-              </Text>
+              <Text style={styles.linkText}>Ainda não tem uma conta? Cadastre-se</Text>
             </TouchableOpacity>
+
           </Animated.View>
         </KeyboardAwareScrollView>
       </TouchableWithoutFeedback>

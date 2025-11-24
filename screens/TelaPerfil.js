@@ -7,13 +7,15 @@ import {
   ActivityIndicator, 
   RefreshControl, 
   ScrollView, 
-  TouchableOpacity 
+  TouchableOpacity,
+  Dimensions
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import api from '../services/api';
 import stylesDefault, { makeStyles } from '../styles/EstiloPerfil'; 
 import { useAppTheme } from '../context/ThemeContext';
 
+import { LineChart } from 'react-native-chart-kit';
 import perfilIcon from '../assets/Perfil.png';
 import iconeSaidaGota from '../assets/Gota.png'; 
 import iconeSaidaRaio from '../assets/Raio.png';
@@ -21,15 +23,13 @@ import iconeSaidaRaio from '../assets/Raio.png';
 export default function PerfilScreen() {
   const { colors, themeName } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
-  const navigation = useNavigation(); // 👈 Hook para navegar entre telas
+  const navigation = useNavigation();
 
   const [usuario, setUsuario] = useState(null);
   const [balanco, setBalanco] = useState(0);
   const [proximasSaidas, setProximasSaidas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
-  
 
   const carregarDados = async () => {
     try {
@@ -39,11 +39,14 @@ export default function PerfilScreen() {
       const hoje = new Date();
       const mes = hoje.getMonth() + 1;
       const ano = hoje.getFullYear();
+
       const responseBalanco = await api.get(`/balanco?mes=${mes}&ano=${ano}`);
       setBalanco(responseBalanco.data.balanco);
 
       const responseSaidas = await api.get('/proximas-saidas');
       setProximasSaidas(responseSaidas.data.slice(0, 2));
+
+      // 📌 BUSCA OS DADOS DO GRÁFICO
 
     } catch (error) {
       console.error('Erro ao carregar dados do perfil:', error);
@@ -86,7 +89,7 @@ export default function PerfilScreen() {
       }>
       <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
-      {/* NAVBAR COM BOTÃO DE PERFIL */}
+      {/* NAVBAR */}
       <View style={styles.navbar}>
         <TouchableOpacity onPress={() => navigation.navigate('PerfilUser')}>
           <Image source={perfilIcon} style={styles.profileIcon} />
@@ -101,9 +104,11 @@ export default function PerfilScreen() {
       {/* CARD DO BALANÇO */}
       <View style={styles.balancoCard}>
         <Text style={styles.balancoCardTitle}>Previsão de saldo</Text>
+
         <Text style={styles.balancoValorText}>
           R$ {balanco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </Text>
+
       </View>
 
       {/* TÍTULO PRÓXIMAS SAÍDAS */}
@@ -115,8 +120,7 @@ export default function PerfilScreen() {
         activeOpacity={0.8}
         onPress={() => navigation.navigate('Financas')}
       >
-        
-      {/* CARDS PRÓXIMAS SAÍDAS */}
+        {/* CARDS PRÓXIMAS SAÍDAS */}
         <View style={styles.proximasSaidasCard}>
           <View style={styles.horizontalCardsContainer}>
             {proximasSaidas.length > 0 ? (
@@ -125,16 +129,15 @@ export default function PerfilScreen() {
                   key={saida.id} 
                   style={index === 0 ? styles.horizontalCardOne : styles.horizontalCardTwo}
                 >
-                <Image 
-                  source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
-                  style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
-                />
-                <Text style={styles.ProximaSaidaValor}>
-                  R$ {saida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </Text>
-                <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
-                <Text style={styles.ProximaSaidaCategoria}>({saida.categoria})</Text>
-              </View>
+                  <Image 
+                    source={index === 0 ? iconeSaidaGota : iconeSaidaRaio} 
+                    style={index === 0 ? styles.iconImage1 : styles.iconImage2} 
+                  />
+                  <Text style={styles.ProximaSaidaValor}>
+                    R$ {saida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </Text>
+                  <Text style={styles.ProximaSaidaTitulo}>{saida.descricao}</Text>
+                </View>
               ))
             ) : (
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
