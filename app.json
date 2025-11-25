@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "softwareKeyboardLayoutMode": "resize",
       "package": "com.anonymous.snackfce759375955427b8556032ab74bd40d"
     },

@@ -241,7 +241,7 @@ export default function TelaCadastro({ navigation }) {
       onPress={() => setShowPassword((prev) => !prev)}
       style={{
         position: 'absolute',
-        right: 5,
+        right: 15,
         top: '30%',
         transform: [{ translateY: -12 }],
         padding: 5,

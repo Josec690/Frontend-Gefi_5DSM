@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, FlatList, ActivityIndicator, ScrollView, RefreshControl, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, ScrollView, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../services/api';
 import stylesDefault, { makeStyles } from '../styles/EstiloInvestimento';
 import { useAppTheme } from '../context/ThemeContext';
+import { SafeAreaView,  SafeAreaProvider,  SafeAreaInsetsContext,  useSafeAreaInsets, } from 'react-native-safe-area-context';
 
 
 export default function InvestScreen() {

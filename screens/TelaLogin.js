@@ -183,7 +183,7 @@ export default function LoginScreen({ navigation }) {
                   onPress={() => setShowPassword(!showPassword)}
                   style={{
                     position: 'absolute',
-                    right: 5,
+                    right: 15,
                     top: '25%',
                     transform: [{ translateY: -12 }],
                     padding: 5,
@@ -191,7 +191,7 @@ export default function LoginScreen({ navigation }) {
                 >
                   <Ionicons
                     name={showPassword ? "eye-off-outline" : "eye-outline"}
-                    size={25}
+                    size={24}
                     color={colors.text}
                   />
                 </TouchableOpacity>

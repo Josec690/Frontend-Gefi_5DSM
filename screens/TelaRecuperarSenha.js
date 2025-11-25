@@ -19,6 +19,7 @@ import Grafico from '../assets/Grafico2.png';
 import seta from '../assets/seta.png';
 import api from '../services/api';
 import { useAppTheme } from '../context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TelaRecuperarSenha({ navigation }) {
   const { colors, themeName } = useAppTheme();
@@ -30,6 +31,8 @@ export default function TelaRecuperarSenha({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [etapa, setEtapa] = useState(1); // 1: solicitar código, 2: redefinir senha
   const [emailErro, setEmailErro] = useState('');
+  const [showNovaSenha, setShowNovaSenha] = useState(false);
+  const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
 
   const handleSolicitarCodigo = async () => {
     setEmailErro('');
@@ -199,27 +202,63 @@ export default function TelaRecuperarSenha({ navigation }) {
               </View>
 
               <View style={{ width: '100%', marginBottom: 15 }}>
-                <TextInput
-                  style={styles.inputSenha}
-                  placeholder=" Nova Senha"
-                  placeholderTextColor={colors.mutedText}
-                  value={novaSenha}
-                  onChangeText={setNovaSenha}
-                  secureTextEntry
-                  editable={!loading}
-                />
+                <View style={{ position: 'relative' }}>
+                  <TextInput
+                    style={[styles.inputSenha, { paddingRight: 45 }]}
+                    placeholder=" Nova Senha"
+                    placeholderTextColor={colors.mutedText}
+                    value={novaSenha}
+                    onChangeText={setNovaSenha}
+                    secureTextEntry={!showNovaSenha}
+                    editable={!loading}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowNovaSenha(!showNovaSenha)}
+                    style={{
+                      position: 'absolute',
+                      right: 15,
+                      top: '25%',
+                      transform: [{ translateY: -12 }],
+                      padding: 5,
+                    }}
+                  >
+                    <Ionicons
+                      name={showNovaSenha ? "eye-off-outline" : "eye-outline"}
+                      size={22}
+                      color={colors.text}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <View style={{ width: '100%', marginBottom: 15 }}>
-                <TextInput
-                  style={styles.inputSenha}
-                  placeholder=" Confirmar Nova Senha"
-                  placeholderTextColor={colors.mutedText}
-                  value={confirmarSenha}
-                  onChangeText={setConfirmarSenha}
-                  secureTextEntry
-                  editable={!loading}
-                />
+                <View style={{ position: 'relative' }}>
+                  <TextInput
+                    style={[styles.inputSenha, { paddingRight: 45 }]}
+                    placeholder=" Confirmar Nova Senha"
+                    placeholderTextColor={colors.mutedText}
+                    value={confirmarSenha}
+                    onChangeText={setConfirmarSenha}
+                    secureTextEntry={!showConfirmarSenha}
+                    editable={!loading}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowConfirmarSenha(!showConfirmarSenha)}
+                    style={{
+                      position: 'absolute',
+                      right: 15,
+                      top: '25%',
+                      transform: [{ translateY: -12 }],
+                      padding: 5,
+                    }}
+                  >
+                    <Ionicons
+                      name={showConfirmarSenha ? "eye-off-outline" : "eye-outline"}
+                      size={22}
+                      color={colors.text}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <TouchableOpacity
