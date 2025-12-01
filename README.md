@@ -1,4 +1,4 @@
-'# 💰 GeFi - Gestão Financeira
+# 💰 GeFi - Gestão Financeira
 
 Sistema de gerenciamento financeiro com Backend (Flask) e Frontend (React Native).
 
