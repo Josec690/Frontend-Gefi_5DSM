@@ -1,5 +1,6 @@
 # 📱 GeFi Frontend - App Mobile
 
+
 Aplicativo mobile de gestão financeira desenvolvido com React Native e Expo.
 
 ---
