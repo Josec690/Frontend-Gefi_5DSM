@@ -8,7 +8,6 @@ import {
   Image,
   Platform,
   KeyboardAvoidingView,
-  TouchableWithoutFeedback,
   Keyboard,
   Alert,
   ActivityIndicator,
@@ -127,29 +126,30 @@ export default function TelaCadastro({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 20}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAwareScrollView
-          enableOnAndroid={true}
-          extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
-          keyboardOpeningTime={0}
-          resetScrollToCoords={{ x: 0, y: 0 }}
-          contentContainerStyle={{
-            flexGrow: 1,
-            minHeight: height,
-            justifyContent: 'center',
+      <KeyboardAwareScrollView
+        enableOnAndroid={true}
+        extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
+        keyboardOpeningTime={0}
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        contentContainerStyle={{
+          flexGrow: 1,
+          minHeight: height,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 20,
+          backgroundColor: colors.background,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View
+          style={{
+            width: '100%',
             alignItems: 'center',
-            padding: 20,
-            backgroundColor: colors.background,
+            transform: [{ translateY }],
           }}
-          showsVerticalScrollIndicator={false}
         >
-          <Animated.View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-              transform: [{ translateY }],
-            }}
-          >
             <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
             <View style={styles.header}>
@@ -269,9 +269,8 @@ export default function TelaCadastro({ navigation }) {
                 <Text style={styles.buttonText}>Cadastrar</Text>
               )}
             </TouchableOpacity>
-          </Animated.View>
-        </KeyboardAwareScrollView>
-      </TouchableWithoutFeedback>
+        </Animated.View>
+      </KeyboardAwareScrollView>
     </KeyboardAvoidingView>
   );
 }
