@@ -116,9 +116,9 @@ export default function LoginScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 20}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAwareScrollView
+      <KeyboardAwareScrollView
           enableOnAndroid={true}
+            keyboardShouldPersistTaps="handled"
           extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
           contentContainerStyle={{
             flexGrow: 1,
@@ -219,7 +219,6 @@ export default function LoginScreen({ navigation }) {
 
           </Animated.View>
         </KeyboardAwareScrollView>
-      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }

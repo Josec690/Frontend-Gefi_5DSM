@@ -5,8 +5,12 @@ import Constants from 'expo-constants';
 
 // URL do backend baseada no ambiente (Expo, emulador, dispositivo físico, web)
 const getBaseURL = () => {
-  const envUrl = process.env.EXPO_PUBLIC_API_URL;
-  if (envUrl) return envUrl;
+  const envUrlRaw = process.env.EXPO_PUBLIC_API_URL;
+  if (envUrlRaw) {
+    // Normaliza a URL de ambiente: remove barras finais e garante o sufixo /api
+    const cleaned = envUrlRaw.replace(/\/+$/, '');
+    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
+  }
 
   if (Platform.OS === 'web') {
     return 'https://pi-gefi-5dsm-backend.onrender.com/api';
