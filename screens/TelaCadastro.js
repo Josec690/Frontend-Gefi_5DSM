@@ -9,6 +9,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   Keyboard,
+  TouchableWithoutFeedback,
   Alert,
   ActivityIndicator,
   Animated,
@@ -165,30 +166,31 @@ export default function TelaCadastro({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 20}
     >
-      <KeyboardAwareScrollView
-        enableOnAndroid={true}
-        extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
-        keyboardOpeningTime={0}
-        resetScrollToCoords={{ x: 0, y: 0 }}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        contentContainerStyle={{
-          flexGrow: 1,
-          minHeight: height,
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: 20,
-          backgroundColor: colors.background,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View
-          style={{
-            width: '100%',
+      {Platform.OS === 'web' ? (
+        <KeyboardAwareScrollView
+          enableOnAndroid={true}
+          extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
+          keyboardOpeningTime={0}
+          resetScrollToCoords={{ x: 0, y: 0 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          contentContainerStyle={{
+            flexGrow: 1,
+            minHeight: height,
+            justifyContent: 'center',
             alignItems: 'center',
-            transform: [{ translateY }],
+            padding: 20,
+            backgroundColor: colors.background,
           }}
+          showsVerticalScrollIndicator={false}
         >
+          <Animated.View
+            style={{
+              width: '100%',
+              alignItems: 'center',
+              transform: [{ translateY }],
+            }}
+          >
             <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
 
             <View style={styles.header}>
@@ -308,8 +310,154 @@ export default function TelaCadastro({ navigation }) {
                 <Text style={styles.buttonText}>Cadastrar</Text>
               )}
             </TouchableOpacity>
-        </Animated.View>
-      </KeyboardAwareScrollView>
+          </Animated.View>
+        </KeyboardAwareScrollView>
+      ) : (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAwareScrollView
+            enableOnAndroid={true}
+            extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
+            keyboardOpeningTime={0}
+            resetScrollToCoords={{ x: 0, y: 0 }}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentContainerStyle={{
+              flexGrow: 1,
+              minHeight: height,
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 20,
+              backgroundColor: colors.background,
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            <Animated.View
+              style={{
+                width: '100%',
+                alignItems: 'center',
+                transform: [{ translateY }],
+              }}
+            >
+              <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
+
+              <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.navigate('Intro')} accessibilityRole="button">
+                  <Text style={styles.title}>Gefi</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.text}>
+                Bem-vindo ao começo de uma vida financeira saudável
+              </Text>
+
+              <Image source={Grafico} style={styles.image} />
+
+              {/* NOME */}
+              <View style={{ width: '100%', marginBottom: 15 }}>
+                {nomeErro ? <Text style={styles.errorText}>{nomeErro}</Text> : null}
+                <TextInput
+                  style={styles.input}
+                  placeholder=" Nome"
+                  placeholderTextColor={colors.mutedText}
+                  value={nome}
+                  onChangeText={setNome}
+                  returnKeyType="next"
+                  onSubmitEditing={() => emailRef.current?.focus()}
+                  blurOnSubmit={false}
+                  editable={!loading}
+                />
+              </View>
+
+              {/* EMAIL */}
+              <View style={{ width: '100%', marginBottom: 15 }}>
+                {emailErro ? <Text style={styles.errorText}>{emailErro}</Text> : null}
+                <TextInput
+                  ref={emailRef}
+                  style={styles.input}
+                  placeholder=" E-mail"
+                  placeholderTextColor={colors.mutedText}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  returnKeyType="next"
+                  onSubmitEditing={() => cpfRef.current?.focus()}
+                  blurOnSubmit={false}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  editable={!loading}
+                />
+              </View>
+
+              {/* CPF */}
+              <View style={{ width: '100%', marginBottom: 15 }}>
+                {cpfErro ? <Text style={styles.errorText}>{cpfErro}</Text> : null}
+                <TextInput
+                  ref={cpfRef}
+                  style={styles.input}
+                  placeholder=" CPF"
+                  placeholderTextColor={colors.mutedText}
+                  value={cpf}
+                  onChangeText={setCpf}
+                  keyboardType="numeric"
+                  returnKeyType="next"
+                  onSubmitEditing={() => senhaRef.current?.focus()}
+                  blurOnSubmit={false}
+                  editable={!loading}
+                />
+              </View>
+
+              {/* SENHA */}
+              <View style={{ width: '100%', marginBottom: 15 }}>
+                {senhaErro ? <Text style={styles.errorText}>{senhaErro}</Text> : null}
+
+                <View style={{ position: 'relative' }}>
+                  <TextInput
+                    ref={senhaRef}
+                    style={[styles.input, { paddingRight: 45 }]}
+                    placeholder=" Senha"
+                    placeholderTextColor={colors.mutedText}
+                    value={senha}
+                    onChangeText={setSenha}
+                    secureTextEntry={!showPassword}
+                    returnKeyType="done"
+                    onSubmitEditing={handleCadastro}
+                    editable={!loading}
+                  />
+
+                  <TouchableOpacity
+                    onPress={() => setShowPassword((prev) => !prev)}
+                    style={{
+                      position: 'absolute',
+                      right: 15,
+                      top: '30%',
+                      transform: [{ translateY: -12 }],
+                      padding: 5,
+                    }}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-off-outline" : "eye-outline"}
+                      size={22}
+                      color={colors.text}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.button, loading && { opacity: 0.5 }]}
+                onPress={handleCadastro}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Cadastrar</Text>
+                )}
+              </TouchableOpacity>
+            </Animated.View>
+          </KeyboardAwareScrollView>
+        </TouchableWithoutFeedback>
+      )}
     </KeyboardAvoidingView>
   );
 }

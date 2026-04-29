@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StatusBar,
   Image,
-  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -33,9 +32,17 @@ export default function TelaRecuperarSenha({ navigation }) {
   const [emailErro, setEmailErro] = useState('');
   const [showNovaSenha, setShowNovaSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
+  const [codigoErro, setCodigoErro] = useState('');
+  const [novaSenhaErro, setNovaSenhaErro] = useState('');
+  const [confirmarSenhaErro, setConfirmarSenhaErro] = useState('');
+  const [geralErro, setGeralErro] = useState('');
 
   const handleSolicitarCodigo = async () => {
     setEmailErro('');
+    setGeralErro('');
+    setCodigoErro('');
+    setNovaSenhaErro('');
+    setConfirmarSenhaErro('');
     
     if (!email.trim()) {
       setEmailErro('Digite seu e-mail');
@@ -53,42 +60,40 @@ export default function TelaRecuperarSenha({ navigation }) {
       await api.post('/recuperar-senha/solicitar', {
         email: email.trim().toLowerCase(),
       });
-      
-      Alert.alert(
-        'Código enviado!',
-        'Um código de recuperação foi enviado para seu e-mail.',
-        [{ text: 'OK', onPress: () => setEtapa(2) }]
-      );
+
+      setEtapa(2);
+      setGeralErro('Um código de recuperação foi enviado para seu e-mail.');
     } catch (error) {
       console.error('Erro ao solicitar código:', error);
-      if (error.response?.data?.erro) {
-        Alert.alert('Erro', error.response.data.erro);
-      } else {
-        Alert.alert('Erro', 'Não foi possível enviar o código. Tente novamente.');
-      }
+      setGeralErro(error.response?.data?.erro || 'Não foi possível enviar o código. Tente novamente.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleRedefinirSenha = async () => {
+    setGeralErro('');
+    setCodigoErro('');
+    setNovaSenhaErro('');
+    setConfirmarSenhaErro('');
+
     if (!codigo.trim()) {
-      Alert.alert('Atenção', 'Digite o código recebido');
+      setCodigoErro('Digite o código recebido');
       return;
     }
 
     if (!novaSenha.trim()) {
-      Alert.alert('Atenção', 'Digite a nova senha');
+      setNovaSenhaErro('Digite a nova senha');
       return;
     }
 
     if (novaSenha.length < 6) {
-      Alert.alert('Atenção', 'A senha deve ter no mínimo 6 caracteres');
+      setNovaSenhaErro('A senha deve ter no mínimo 6 caracteres');
       return;
     }
 
     if (novaSenha !== confirmarSenha) {
-      Alert.alert('Atenção', 'As senhas não coincidem');
+      setConfirmarSenhaErro('As senhas não coincidem');
       return;
     }
 
@@ -99,19 +104,12 @@ export default function TelaRecuperarSenha({ navigation }) {
         codigo: codigo.trim(),
         nova_senha: novaSenha,
       });
-      
-      Alert.alert(
-        'Sucesso!',
-        'Sua senha foi redefinida com sucesso!',
-        [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
-      );
+
+      setGeralErro('Sua senha foi redefinida com sucesso!');
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Erro ao redefinir senha:', error);
-      if (error.response?.data?.erro) {
-        Alert.alert('Erro', error.response.data.erro);
-      } else {
-        Alert.alert('Erro', 'Não foi possível redefinir a senha. Tente novamente.');
-      }
+      setGeralErro(error.response?.data?.erro || 'Não foi possível redefinir a senha. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -122,9 +120,10 @@ export default function TelaRecuperarSenha({ navigation }) {
       style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      {Platform.OS === 'web' ? (
         <KeyboardAwareScrollView
           enableOnAndroid={true}
+          keyboardShouldPersistTaps="handled"
           extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
           contentContainerStyle={{
             flexGrow: 1,
@@ -154,6 +153,8 @@ export default function TelaRecuperarSenha({ navigation }) {
               ? 'Digite seu e-mail para receber o código de recuperação'
               : 'Digite o código recebido e sua nova senha'}
           </Text>
+
+          {geralErro ? <Text style={styles.errorText}>{geralErro}</Text> : null}
           
           <Image source={Grafico} style={styles.image} />
 
@@ -189,6 +190,7 @@ export default function TelaRecuperarSenha({ navigation }) {
           ) : (
             <>
               <View style={{ width: '100%', marginBottom: 15 }}>
+                {codigoErro ? <Text style={styles.errorText}>{codigoErro}</Text> : null}
                 <TextInput
                   style={styles.inputEmail}
                   placeholder=" Código de 6 dígitos"
@@ -202,6 +204,7 @@ export default function TelaRecuperarSenha({ navigation }) {
               </View>
 
               <View style={{ width: '100%', marginBottom: 15 }}>
+                {novaSenhaErro ? <Text style={styles.errorText}>{novaSenhaErro}</Text> : null}
                 <View style={{ position: 'relative' }}>
                   <TextInput
                     style={[styles.inputSenha, { paddingRight: 45 }]}
@@ -232,6 +235,7 @@ export default function TelaRecuperarSenha({ navigation }) {
               </View>
 
               <View style={{ width: '100%', marginBottom: 15 }}>
+                {confirmarSenhaErro ? <Text style={styles.errorText}>{confirmarSenhaErro}</Text> : null}
                 <View style={{ position: 'relative' }}>
                   <TextInput
                     style={[styles.inputSenha, { paddingRight: 45 }]}
@@ -281,7 +285,174 @@ export default function TelaRecuperarSenha({ navigation }) {
             </>
           )}
         </KeyboardAwareScrollView>
-      </TouchableWithoutFeedback>
+      ) : (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAwareScrollView
+            enableOnAndroid={true}
+            keyboardShouldPersistTaps="handled"
+            extraScrollHeight={Platform.OS === 'android' ? 120 : 60}
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 20,
+              backgroundColor: colors.background,
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            <StatusBar barStyle={themeName === 'dark' ? 'light-content' : 'dark-content'} backgroundColor="transparent" />
+
+            {/* Botão voltar */}
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{ position: 'absolute', top: 40, left: 20 }}
+            >
+              <Image source={seta} style={{ width: 30, height: 30, tintColor: colors.text }} />
+            </TouchableOpacity>
+
+            <View style={styles.header}>
+              <Text style={styles.title}>Recuperar Senha</Text>
+            </View>
+
+            <Text style={styles.text}>
+              {etapa === 1
+                ? 'Digite seu e-mail para receber o código de recuperação'
+                : 'Digite o código recebido e sua nova senha'}
+            </Text>
+
+            {geralErro ? <Text style={styles.errorText}>{geralErro}</Text> : null}
+            
+            <Image source={Grafico} style={styles.image} />
+
+            {etapa === 1 ? (
+              <>
+                <View style={{ width: '100%', marginBottom: 15 }}>
+                  {emailErro ? <Text style={styles.errorText}>{emailErro}</Text> : null}
+                  <TextInput
+                    style={styles.inputEmail}
+                    placeholder=" E-mail"
+                    placeholderTextColor={colors.mutedText}
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    editable={!loading}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.button, loading && { opacity: 0.5 }]}
+                  onPress={handleSolicitarCodigo}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.buttonText}>Enviar Código</Text>
+                  )}
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <View style={{ width: '100%', marginBottom: 15 }}>
+                  {codigoErro ? <Text style={styles.errorText}>{codigoErro}</Text> : null}
+                  <TextInput
+                    style={styles.inputEmail}
+                    placeholder=" Código de 6 dígitos"
+                    placeholderTextColor={colors.mutedText}
+                    value={codigo}
+                    onChangeText={setCodigo}
+                    keyboardType="number-pad"
+                    maxLength={6}
+                    editable={!loading}
+                  />
+                </View>
+
+                <View style={{ width: '100%', marginBottom: 15 }}>
+                  {novaSenhaErro ? <Text style={styles.errorText}>{novaSenhaErro}</Text> : null}
+                  <View style={{ position: 'relative' }}>
+                    <TextInput
+                      style={[styles.inputSenha, { paddingRight: 45 }]}
+                      placeholder=" Nova Senha"
+                      placeholderTextColor={colors.mutedText}
+                      value={novaSenha}
+                      onChangeText={setNovaSenha}
+                      secureTextEntry={!showNovaSenha}
+                      editable={!loading}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowNovaSenha(!showNovaSenha)}
+                      style={{
+                        position: 'absolute',
+                        right: 15,
+                        top: '25%',
+                        transform: [{ translateY: -12 }],
+                        padding: 5,
+                      }}
+                    >
+                      <Ionicons
+                        name={showNovaSenha ? "eye-off-outline" : "eye-outline"}
+                        size={22}
+                        color={colors.text}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <View style={{ width: '100%', marginBottom: 15 }}>
+                  {confirmarSenhaErro ? <Text style={styles.errorText}>{confirmarSenhaErro}</Text> : null}
+                  <View style={{ position: 'relative' }}>
+                    <TextInput
+                      style={[styles.inputSenha, { paddingRight: 45 }]}
+                      placeholder=" Confirmar Nova Senha"
+                      placeholderTextColor={colors.mutedText}
+                      value={confirmarSenha}
+                      onChangeText={setConfirmarSenha}
+                      secureTextEntry={!showConfirmarSenha}
+                      editable={!loading}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowConfirmarSenha(!showConfirmarSenha)}
+                      style={{
+                        position: 'absolute',
+                        right: 15,
+                        top: '25%',
+                        transform: [{ translateY: -12 }],
+                        padding: 5,
+                      }}
+                    >
+                      <Ionicons
+                        name={showConfirmarSenha ? "eye-off-outline" : "eye-outline"}
+                        size={22}
+                        color={colors.text}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.button, loading && { opacity: 0.5 }]}
+                  onPress={handleRedefinirSenha}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.buttonText}>Redefinir Senha</Text>
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => setEtapa(1)} style={{ marginTop: 15 }}>
+                  <Text style={styles.linkText}>
+                    Não recebeu o código? Reenviar
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </KeyboardAwareScrollView>
+        </TouchableWithoutFeedback>
+      )}
     </KeyboardAvoidingView>
   );
 }
