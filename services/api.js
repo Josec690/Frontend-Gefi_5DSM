@@ -8,6 +8,10 @@ const getBaseURL = () => {
   const envUrl = process.env.EXPO_PUBLIC_API_URL;
   if (envUrl) return envUrl;
 
+  if (Platform.OS === 'web') {
+    return 'https://pi-gefi-5dsm-backend.onrender.com/api';
+  }
+
   const hostFromExpo = Constants.expoConfig?.hostUri?.split(':')?.[0]
     || Constants.manifest?.debuggerHost?.split(':')?.[0];
   if (hostFromExpo) return `http://${hostFromExpo}:5000/api`;

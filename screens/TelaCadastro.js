@@ -47,6 +47,25 @@ export default function TelaCadastro({ navigation }) {
 
   const translateY = useRef(new Animated.Value(0)).current;
 
+  const showFeedback = (title, message) => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.alert === 'function') {
+      window.alert(`${title}\n\n${message}`);
+      return;
+    }
+
+    Alert.alert(title, message);
+  };
+
+  const validarEmailLocal = (valor) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(valor.trim().toLowerCase());
+  };
+
+  const validarCpfLocal = (valor) => {
+    const apenasDigitos = valor.replace(/\D/g, '');
+    return apenasDigitos.length === 11;
+  };
+
   useEffect(() => {
     StatusBar.setBackgroundColor('transparent');
     StatusBar.setBarStyle(themeName === 'dark' ? 'light-content' : 'dark-content');
@@ -85,35 +104,55 @@ export default function TelaCadastro({ navigation }) {
     setSenhaErro('');
 
     let hasError = false;
-    if (!nome.trim()) { setNomeErro('Esse campo precisa ser preenchido!'); hasError = true; }
-    if (!email.trim()) { setEmailErro('Esse campo precisa ser preenchido!'); hasError = true; }
-    if (!cpf.trim()) { setCpfErro('Esse campo precisa ser preenchido!'); hasError = true; }
-    if (!senha.trim()) { setSenhaErro('Esse campo precisa ser preenchido!'); hasError = true; }
+    const nomeLimpo = nome.trim();
+    const emailLimpo = email.trim().toLowerCase();
+    const cpfLimpo = cpf.trim();
+    const senhaLimpa = senha.trim();
+
+    if (!nomeLimpo) { setNomeErro('Esse campo precisa ser preenchido!'); hasError = true; }
+    if (!emailLimpo) { setEmailErro('Esse campo precisa ser preenchido!'); hasError = true; }
+    if (!cpfLimpo) { setCpfErro('Esse campo precisa ser preenchido!'); hasError = true; }
+    if (!senhaLimpa) { setSenhaErro('Esse campo precisa ser preenchido!'); hasError = true; }
+
+    if (!hasError && !validarEmailLocal(emailLimpo)) {
+      setEmailErro('Digite um email válido.');
+      hasError = true;
+    }
+
+    if (!hasError && !validarCpfLocal(cpfLimpo)) {
+      setCpfErro('Digite um CPF válido com 11 números.');
+      hasError = true;
+    }
+
+    if (!hasError && senhaLimpa.length < 6) {
+      setSenhaErro('A senha deve ter no mínimo 6 caracteres.');
+      hasError = true;
+    }
 
     if (hasError) return;
 
     setLoading(true);
     try {
       const response = await api.post('/cadastro', {
-        nome: nome.trim(),
-        email: email.trim().toLowerCase(),
-        cpf: cpf.trim(),
-        senha,
+        nome: nomeLimpo,
+        email: emailLimpo,
+        cpf: cpfLimpo,
+        senha: senhaLimpa,
       });
 
       await AsyncStorage.setItem('token', response.data.token);
       await AsyncStorage.setItem('usuario_id', response.data.usuario_id);
 
-      Alert.alert('Sucesso!', 'Cadastro realizado com sucesso!');
+      showFeedback('Sucesso!', 'Cadastro realizado com sucesso!');
       navigation.navigate('TelaPerguntas');
     } catch (error) {
       console.error('Erro no cadastro:', error);
       if (error.response) {
-        Alert.alert('Erro', error.response.data.erro || 'Erro ao cadastrar');
+        showFeedback('Erro', error.response.data.erro || 'Erro ao cadastrar');
       } else if (error.request) {
-        Alert.alert('Erro', 'Não foi possível conectar ao servidor. Verifique sua conexão.');
+        showFeedback('Erro', 'Não foi possível conectar ao servidor. Verifique sua conexão.');
       } else {
-        Alert.alert('Erro', 'Erro ao processar cadastro');
+        showFeedback('Erro', 'Erro ao processar cadastro');
       }
     } finally {
       setLoading(false);
