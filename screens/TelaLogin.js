@@ -329,7 +329,6 @@ export default function LoginScreen({ navigation }) {
             </TouchableOpacity>
 
           </Animated.View>
-          </Animated.View>
         </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>
       )}
